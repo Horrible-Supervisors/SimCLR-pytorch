@@ -16,11 +16,11 @@ from torch.utils.tensorboard import SummaryWriter
 # SimCLR
 from simclr import SimCLR
 from simclr.modules import NT_Xent, get_resnet
-from simclr.modules.transformations import TransformsSimCLR
+from simclr.modules.transformations.simclr import TransformsSimCLR, ImageVariations
 from simclr.modules.sync_batchnorm import convert_model
 
 from model import load_optimizer, save_model
-from utils import yaml_config_hook
+from utils import yaml_config_hook, data
 
 
 def train(args, train_loader, model, criterion, optimizer, writer):
@@ -46,7 +46,8 @@ def train(args, train_loader, model, criterion, optimizer, writer):
             print(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
 
         if args.nr == 0:
-            writer.add_scalar("Loss/train_epoch", loss.item(), args.global_step)
+            writer.add_scalar("Loss/train_epoch",
+                              loss.item(), args.global_step)
             args.global_step += 1
 
         loss_epoch += loss.item()
@@ -76,12 +77,20 @@ def main(gpu, args):
             download=True,
             transform=TransformsSimCLR(size=args.image_size),
         )
+    elif args.dataset == "Imagenette":
+        train_dataset = data.ImagenetteDataset(
+            args.dataset_dir + "/imagenette/train.csv",
+            args.dataset_dir + "/imagenette/train",
+            num_variations=10,
+            transform=ImageVariations(),
+        )
     else:
         raise NotImplementedError
 
     if args.nodes > 1:
         train_sampler = torch.utils.data.distributed.DistributedSampler(
-            train_dataset, num_replicas=args.world_size, rank=rank, shuffle=True
+            train_dataset, num_replicas=args.world_size,
+            rank=rank, shuffle=True
         )
     else:
         train_sampler = None
@@ -105,7 +114,8 @@ def main(gpu, args):
         model_fp = os.path.join(
             args.model_path, "checkpoint_{}.tar".format(args.epoch_num)
         )
-        model.load_state_dict(torch.load(model_fp, map_location=args.device.type))
+        model.load_state_dict(torch.load(
+            model_fp, map_location=args.device.type))
     model = model.to(args.device)
 
     # optimizer / loss
@@ -132,9 +142,10 @@ def main(gpu, args):
     for epoch in range(args.start_epoch, args.epochs):
         if train_sampler is not None:
             train_sampler.set_epoch(epoch)
-        
+
         lr = optimizer.param_groups[0]["lr"]
-        loss_epoch = train(args, train_loader, model, criterion, optimizer, writer)
+        loss_epoch = train(args, train_loader, model,
+                           criterion, optimizer, writer)
 
         if args.nr == 0 and scheduler:
             scheduler.step()
@@ -143,14 +154,16 @@ def main(gpu, args):
             save_model(args, model, optimizer)
 
         if args.nr == 0:
-            writer.add_scalar("Loss/train", loss_epoch / len(train_loader), epoch)
+            writer.add_scalar("Loss/train", loss_epoch /
+                              len(train_loader), epoch)
             writer.add_scalar("Misc/learning_rate", lr, epoch)
             print(
-                f"Epoch [{epoch}/{args.epochs}]\t Loss: {loss_epoch / len(train_loader)}\t lr: {round(lr, 5)}"
+                f"""Epoch [{epoch}/{args.epochs}]\t Loss: {
+                    loss_epoch / len(train_loader)}\t lr: {round(lr, 5)}"""
             )
             args.current_epoch += 1
 
-    ## end training
+    # end training
     save_model(args, model, optimizer)
 
 
@@ -170,13 +183,15 @@ if __name__ == "__main__":
     if not os.path.exists(args.model_path):
         os.makedirs(args.model_path)
 
-    args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    args.device = torch.device(
+        "cuda:0" if torch.cuda.is_available() else "cpu")
     args.num_gpus = torch.cuda.device_count()
     args.world_size = args.gpus * args.nodes
 
     if args.nodes > 1:
         print(
-            f"Training with {args.nodes} nodes, waiting until all nodes join before starting training"
+            f"""Training with {args.nodes} nodes, waiting until
+            all nodes join before starting training"""
         )
         mp.spawn(main, args=(args,), nprocs=args.gpus, join=True)
     else:

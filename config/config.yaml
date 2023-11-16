@@ -12,7 +12,8 @@ batch_size: 128
 image_size: 224
 start_epoch: 0
 epochs: 100
-dataset: "CIFAR10" # STL10
+# dataset: "CIFAR10" # STL10
+dataset: "Imagenette"
 pretrain: True 
 
 # model options
