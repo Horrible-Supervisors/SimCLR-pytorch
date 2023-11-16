@@ -33,14 +33,14 @@ class ImagenetteDataset(Dataset):
         img_name = os.path.join(self.root_dir,
                                 self.image_frame.iloc[idx, 0])
         image = io.imread(img_name)
-        label = self.image_frame.iloc[idx, 1]    
+        label = self.image_frame.iloc[idx, 1]
 
         a, b = np.random.randint(0, self.num_variations, 2)
         var1_name = os.path.join(self.root_dir,
-                                 self.image_frame.iloc[idx, 1+a])
+                                 self.image_frame.iloc[idx, 2+a])
         var1 = io.imread(var1_name)
         var2_name = os.path.join(self.root_dir,
-                                 self.image_frame.iloc[idx, 1+b])
+                                 self.image_frame.iloc[idx, 2+b])
         var2 = io.imread(var2_name)
 
         if self.transform is not None:
