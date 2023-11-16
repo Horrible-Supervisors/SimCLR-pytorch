@@ -32,3 +32,14 @@ class TransformsSimCLR:
 
     def __call__(self, x):
         return self.train_transform(x), self.train_transform(x)
+
+
+class ImageVariations:
+    """
+    """
+
+    def __init__(self):
+        pass
+
+    def __call__(self, x, y):
+        return x, y
