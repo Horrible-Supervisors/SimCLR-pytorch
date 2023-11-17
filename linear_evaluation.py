@@ -148,13 +148,11 @@ if __name__ == "__main__":
         train_dataset = data.ImagenetteDataset(
             args.dataset_dir + "/imagenette/train.csv",
             args.dataset_dir + "/imagenette/train",
-            num_variations=10,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
         test_dataset = data.ImagenetteDataset(
             args.dataset_dir + "/imagenette/val.csv",
             args.dataset_dir + "/imagenette/val",
-            num_variations=10,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
     else:

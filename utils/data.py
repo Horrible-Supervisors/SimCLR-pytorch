@@ -13,7 +13,7 @@ from simclr.modules.transformations.simclr import ImageVariations
 class ImagenetteDataset(Dataset):
     """Imagenette dataset."""
 
-    def __init__(self, csv_file, root_dir, num_variations, transform=None):
+    def __init__(self, csv_file, root_dir, num_variations=0, transform=None):
         """
         Arguments:
             csv_file (string): Path to the csv file with image, labels and ids.
@@ -40,7 +40,7 @@ class ImagenetteDataset(Dataset):
         label = self.image_frame.iloc[idx, 1]
 
         if self.transform is not None:
-            if self.transform is ImageVariations:
+            if self.num_variations > 0:
                 a, b = np.random.randint(0, self.num_variations, 2)
                 print(a, b)
                 var1_name = os.path.join(self.root_dir,
