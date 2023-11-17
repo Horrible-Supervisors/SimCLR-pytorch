@@ -36,6 +36,7 @@ class ImagenetteDataset(Dataset):
         img_name = os.path.join(self.root_dir,
                                 self.image_frame.iloc[idx, 0])
         image = io.imread(img_name)
+        image = Image.fromarray(image)
         label = self.image_frame.iloc[idx, 1]
 
         a, b = np.random.randint(0, self.num_variations, 2)
@@ -50,7 +51,6 @@ class ImagenetteDataset(Dataset):
             if self.transform is ImageVariations:
                 image = self.transform([var1, var2])
             else:
-                image = Image.fromarray(image)
                 image = self.transform(image)
 
         return image, label
