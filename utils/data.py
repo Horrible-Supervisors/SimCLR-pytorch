@@ -44,6 +44,6 @@ class ImagenetteDataset(Dataset):
         var2 = io.imread(var2_name)
 
         if self.transform is not None:
-            image = self.transform(var1, var2)
+            image = self.transform([var1, var2])
 
         return image, label
