@@ -42,7 +42,6 @@ class ImagenetteDataset(Dataset):
         if self.transform is not None:
             if self.num_variations > 0:
                 a, b = np.random.choice(self.num_variations, 2, replace=False)
-                print(a, b)
                 var1_name = os.path.join(self.root_dir,
                                          self.image_frame.iloc[idx, 2+a])
                 var1 = io.imread(var1_name)
