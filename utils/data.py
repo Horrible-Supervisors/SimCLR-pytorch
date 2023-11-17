@@ -45,9 +45,10 @@ class ImagenetteDataset(Dataset):
                                  self.image_frame.iloc[idx, 2+b])
         var2 = io.imread(var2_name)
 
-        if self.transform is ImageVariations:
-            image = self.transform([var1, var2])
-        elif self.transform is TransformsSimCLR:
-            image = self.transform(image)
+        if self.transform is not None:
+            if self.transform is ImageVariations:
+                image = self.transform([var1, var2])
+            else:
+                image = self.transform(image)
 
         return image, label
