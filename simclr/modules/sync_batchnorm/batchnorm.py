@@ -49,7 +49,8 @@ def _unsqueeze_ft(tensor):
     return tensor.unsqueeze(0).unsqueeze(-1)
 
 
-_ChildMessage = collections.namedtuple("_ChildMessage", ["sum", "ssum", "sum_size"])
+_ChildMessage = collections.namedtuple(
+    "_ChildMessage", ["sum", "ssum", "sum_size"])
 _MasterMessage = collections.namedtuple("_MasterMessage", ["sum", "inv_std"])
 
 
@@ -147,7 +148,8 @@ class _SynchronizedBatchNorm(_BatchNorm):
 
         # Always using same "device order" makes the ReduceAdd operation faster.
         # Thanks to:: Tete Xiao (http://tetexiao.com/)
-        intermediates = sorted(intermediates, key=lambda i: i[1].sum.get_device())
+        intermediates = sorted(
+            intermediates, key=lambda i: i[1].sum.get_device())
 
         to_reduce = [i[1][:2] for i in intermediates]
         to_reduce = [j for i in to_reduce for j in i]  # flatten
@@ -161,7 +163,8 @@ class _SynchronizedBatchNorm(_BatchNorm):
 
         outputs = []
         for i, rec in enumerate(intermediates):
-            outputs.append((rec[0], _MasterMessage(*broadcasted[i * 2 : i * 2 + 2])))
+            outputs.append((rec[0], _MasterMessage(
+                *broadcasted[i * 2: i * 2 + 2])))
 
         return outputs
 
@@ -316,7 +319,8 @@ class SynchronizedBatchNorm2d(_SynchronizedBatchNorm):
 
     def _check_input_dim(self, input):
         if input.dim() != 4:
-            raise ValueError("expected 4D input (got {}D input)".format(input.dim()))
+            raise ValueError(
+                "expected 4D input (got {}D input)".format(input.dim()))
 
 
 class SynchronizedBatchNorm3d(_SynchronizedBatchNorm):
@@ -378,7 +382,8 @@ class SynchronizedBatchNorm3d(_SynchronizedBatchNorm):
 
     def _check_input_dim(self, input):
         if input.dim() != 5:
-            raise ValueError("expected 5D input (got {}D input)".format(input.dim()))
+            raise ValueError(
+                "expected 5D input (got {}D input)".format(input.dim()))
 
 
 @contextlib.contextmanager
