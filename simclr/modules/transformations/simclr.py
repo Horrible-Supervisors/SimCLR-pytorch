@@ -44,12 +44,15 @@ class ImageVariations:
     """
 
     def __init__(self):
-        pass
+        self.variation_transform = torchvision.transforms.Compose([
+                torchvision.transforms.ToTensor(),
+        ])
 
     def __call__(self, vars):
         x, y = vars
-        x = x.astype(np.float32)
-        y = y.astype(np.float32)
-        x = torch.from_numpy(np.transpose(x, (2, 0, 1)))
-        y = torch.from_numpy(np.transpose(y, (2, 0, 1)))
-        return x, y
+        # x = x.astype(np.float32)
+        # y = y.astype(np.float32)
+        # x = torch.from_numpy(np.transpose(x, (2, 0, 1)))
+        # y = torch.from_numpy(np.transpose(y, (2, 0, 1)))
+
+        return self.variation_transform(x), self.variation_transform(y)
