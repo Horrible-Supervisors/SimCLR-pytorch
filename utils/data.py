@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import torch
 from skimage import io
+from PIL import Image
 from torch.utils.data import Dataset
 
 from simclr.modules.transformations.simclr import ImageVariations
@@ -49,7 +50,7 @@ class ImagenetteDataset(Dataset):
             if self.transform is ImageVariations:
                 image = self.transform([var1, var2])
             else:
-                image = torch.from_numpy(image)
+                image = Image.fromarray(image)
                 image = self.transform(image)
 
         return image, label
