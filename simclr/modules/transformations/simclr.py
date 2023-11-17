@@ -28,6 +28,7 @@ class TransformsSimCLR:
         self.test_transform = torchvision.transforms.Compose(
             [
                 torchvision.transforms.Resize(size=size),
+                torchvision.transforms.CenterCrop(size=size),
                 torchvision.transforms.ToTensor(),
             ]
         )
