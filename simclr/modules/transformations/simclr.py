@@ -1,3 +1,5 @@
+import numpy as np
+import torch
 import torchvision
 
 
@@ -36,10 +38,16 @@ class TransformsSimCLR:
 
 class ImageVariations:
     """
+    Picks a random variation of the image, converts it to a tensor,
+    change the shape of the tensor to (C, H, W) and returns it.
     """
 
     def __init__(self):
         pass
 
     def __call__(self, x, y):
+        x = x.astype(np.float32)
+        y = y.astype(np.float32)
+        x = torch.from_numpy(np.transpose(x, (2, 0, 1)))
+        y = torch.from_numpy(np.transpose(y, (2, 0, 1)))
         return x, y
