@@ -45,7 +45,8 @@ class ImageVariations:
     def __init__(self):
         pass
 
-    def __call__(self, x, y):
+    def __call__(self, vars):
+        x, y = vars
         x = x.astype(np.float32)
         y = y.astype(np.float32)
         x = torch.from_numpy(np.transpose(x, (2, 0, 1)))
