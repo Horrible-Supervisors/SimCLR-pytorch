@@ -42,13 +42,14 @@ class ImagenetteDataset(Dataset):
         if self.transform is not None:
             if self.transform is ImageVariations:
                 a, b = np.random.randint(0, self.num_variations, 2)
+                print(a, b)
                 var1_name = os.path.join(self.root_dir,
                                          self.image_frame.iloc[idx, 2+a])
                 var1 = io.imread(var1_name)
                 var2_name = os.path.join(self.root_dir,
                                          self.image_frame.iloc[idx, 2+b])
                 var2 = io.imread(var2_name)
-                image = self.transform([var1, var2])
+                image = self.transform((var1, var2))
             else:
                 harsh = image
                 image = self.transform(image)
