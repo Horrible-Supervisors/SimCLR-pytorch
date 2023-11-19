@@ -66,6 +66,7 @@ class ImagenetteDataset(Dataset):
             image = self.transform((image, var1, var2, 2))
         elif self.transform_type == 3:
             a = np.random.choice(self.num_variations, 1, replace=False)
+            a = a[0]
             var1_name = os.path.join(self.root_dir,
                                      self.image_frame.iloc[idx, 2+a])
             var1 = Image.open(var1_name)
