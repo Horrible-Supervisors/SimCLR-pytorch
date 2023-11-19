@@ -6,6 +6,8 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 
+COUNT_IMAGENETTE_CLASSES = 10
+COUNT_MAX_NEG_SAMPLE_VARIATIONS = 10
 
 class ImagenetteDataset(Dataset):
     """Imagenette dataset."""
@@ -75,3 +77,57 @@ class ImagenetteDataset(Dataset):
             image = self.transform(image)
 
         return image, label
+    
+class NegativeImagenetteDataset(Dataset):
+    # Purpose of class: 
+    # Obtaining negative image variations for all class labels in Imagenette dataset
+    
+    def __init__(self, images_folder, batch_size) -> None:
+        # Expectations:
+        # Image_folder exists and contains images for all class labels (No assert, but this will crash the program later)
+        # Batch size is less than or equal to the number of available image files (Enforced by assert)
+        super().__init__()
+        self.max_classes = COUNT_IMAGENETTE_CLASSES
+        self.max_variations = COUNT_MAX_NEG_SAMPLE_VARIATIONS
+
+        self.images_folder = images_folder
+        self.batch_size = batch_size
+        assert len([file_name for file_name in os.listdir(images_folder)]) >= self.batch_size, \
+            'Number of available files is less than the batch_size'
+        self.len = self.batch_size
+
+        self.num_variations = int(self.batch_size/self.max_classes)
+        if self.num_variations == 0: self.num_variations = 1
+        self.randomize_samples()
+
+        print('max_classes = ', self.max_classes)
+        print('max_variations = ', self.max_variations)
+        print('images_folder = ', self.images_folder)
+        print('batch_size = ', self.batch_size)
+        print('num_variations = ', self.num_variations)
+        print('len = ', self.len)
+        print('class_indices = ', self.class_indices)
+        print('variation_indices = ', self.variation_indices)
+    
+    def __len__(self):
+        return self.batch_size
+    
+    def randomize_samples(self):
+        # Meant to be called before every epoch
+        # Randomizes samples that wil be picked
+        self.class_indices = np.random.choice(np.arange(self.max_classes), size=min(self.max_classes, self.batch_size), replace=False)
+        self.variation_indices = []
+        for _ in self.class_indices:
+            self.variation_indices = np.concatenate((self.variation_indices, 
+                                                     np.random.choice(np.arange(self.max_variations), size=self.num_variations, replace=False)))
+    
+    def __getitem__(self, index) :
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        class_index = self.class_indices[int(index/len(self.class_indices))]
+        variation_index = self.variation_indices[index]
+        img_name = os.path.join(self.images_folder, str(class_index) + '_' + str(variation_index))
+        print(img_name)
+        image = Image.open(img_name)
+        return image
