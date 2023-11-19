@@ -16,7 +16,7 @@ from torch.utils.tensorboard import SummaryWriter
 # SimCLR
 from simclr import SimCLR
 from simclr.modules import NT_Xent, get_resnet
-from simclr.modules.transformations.simclr import TransformsSimCLR
+from simclr.modules.transformations import TransformsSimCLR
 from simclr.modules.sync_batchnorm import convert_model
 
 from model import load_optimizer, save_model

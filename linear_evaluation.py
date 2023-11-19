@@ -2,12 +2,11 @@ import os
 import argparse
 import torch
 import torchvision
-import torchvision.transforms as transforms
 import numpy as np
 
 from simclr import SimCLR
 from simclr.modules import LogisticRegression, get_resnet
-from simclr.modules.transformations.simclr import TransformsSimCLR, ImageVariations
+from simclr.modules.transformations import TransformsSimCLR
 
 from utils import yaml_config_hook, data
 
@@ -42,7 +41,8 @@ def get_features(simclr_model, train_loader, test_loader, device):
     return train_X, train_y, test_X, test_y
 
 
-def create_data_loaders_from_arrays(X_train, y_train, X_test, y_test, batch_size):
+def create_data_loaders_from_arrays(X_train, y_train,
+                                    X_test, y_test, batch_size):
     train = torch.utils.data.TensorDataset(
         torch.from_numpy(X_train), torch.from_numpy(y_train)
     )
@@ -59,10 +59,10 @@ def create_data_loaders_from_arrays(X_train, y_train, X_test, y_test, batch_size
     return train_loader, test_loader
 
 
-def train(args, loader, simclr_model, model, criterion, optimizer):
+def train(args, loader, model, criterion, optimizer):
     loss_epoch = 0
     accuracy_epoch = 0
-    for step, (x, y) in enumerate(loader):
+    for _, (x, y) in enumerate(loader):
         optimizer.zero_grad()
 
         x = x.to(args.device)
@@ -79,19 +79,15 @@ def train(args, loader, simclr_model, model, criterion, optimizer):
         optimizer.step()
 
         loss_epoch += loss.item()
-        # if step % 100 == 0:
-        #     print(
-        #         f"Step [{step}/{len(loader)}]\t Loss: {loss.item()}\t Accuracy: {acc}"
-        #     )
 
     return loss_epoch, accuracy_epoch
 
 
-def test(args, loader, simclr_model, model, criterion, optimizer):
+def test(args, loader, model, criterion):
     loss_epoch = 0
     accuracy_epoch = 0
     model.eval()
-    for step, (x, y) in enumerate(loader):
+    for _, (x, y) in enumerate(loader):
         model.zero_grad()
 
         x = x.to(args.device)
@@ -179,12 +175,14 @@ if __name__ == "__main__":
 
     # load pre-trained model from checkpoint
     simclr_model = SimCLR(encoder, args.projection_dim, n_features)
-    model_fp = os.path.join(args.model_path, "checkpoint_{}.tar".format(args.epoch_num))
-    simclr_model.load_state_dict(torch.load(model_fp, map_location=args.device.type))
+    model_fp = os.path.join(
+        args.model_path, "checkpoint_{}.tar".format(args.epoch_num))
+    simclr_model.load_state_dict(torch.load(
+        model_fp, map_location=args.device.type))
     simclr_model = simclr_model.to(args.device)
     simclr_model.eval()
 
-    ## Logistic Regression
+    # Logistic Regression
     n_classes = 10  # CIFAR-10 / STL-10
     model = LogisticRegression(simclr_model.n_features, n_classes)
     model = model.to(args.device)
@@ -203,16 +201,13 @@ if __name__ == "__main__":
 
     for epoch in range(args.logistic_epochs):
         loss_epoch, accuracy_epoch = train(
-            args, arr_train_loader, simclr_model, model, criterion, optimizer
+            args, arr_train_loader, model, criterion, optimizer
         )
-        print(
-            f"Epoch [{epoch}/{args.logistic_epochs}]\t Loss: {loss_epoch / len(arr_train_loader)}\t Accuracy: {accuracy_epoch / len(arr_train_loader)}"
-        )
+        print(f"""Epoch [{epoch}/{args.logistic_epochs}]\t """
+              f"""Loss: {loss_epoch / len(arr_train_loader)}\t """
+              f"""Accuracy: {accuracy_epoch / len(arr_train_loader)}""")
 
     # final testing
-    loss_epoch, accuracy_epoch = test(
-        args, arr_test_loader, simclr_model, model, criterion, optimizer
-    )
-    print(
-        f"[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t Accuracy: {accuracy_epoch / len(arr_test_loader)}"
-    )
+    loss_epoch, accuracy_epoch = test(args, arr_test_loader, model, criterion)
+    print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
+          f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}""")
