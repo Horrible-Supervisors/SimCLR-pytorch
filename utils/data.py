@@ -29,6 +29,7 @@ class ImagenetteDataset(Dataset):
         self.image_frame = pd.read_csv(csv_file)
         self.root_dir = root_dir
         self.num_variations = num_variations
+        self.transform_type = transform_type
         self.transform = transform
 
     def __len__(self):
