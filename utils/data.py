@@ -23,6 +23,7 @@ class ImagenetteDataset(Dataset):
                 2: Randomly choose between traditional SimCLR augmentations
                    and Image Variation
                 3: One traditional SimCLR augmentation and one Image Variation
+                4: Test time augmentation (resize and center crop)
             transform (callable, optional): Optional transform to be applied
         """
         self.image_frame = pd.read_csv(csv_file)
@@ -68,5 +69,7 @@ class ImagenetteDataset(Dataset):
                                      self.image_frame.iloc[idx, 2+a])
             var1 = Image.open(var1_name)
             image = self.transform((image, var1, 0, 3))
+        else:
+            image = self.transform(image)
 
         return image, label
