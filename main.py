@@ -16,7 +16,7 @@ from torch.utils.tensorboard import SummaryWriter
 # SimCLR
 from simclr import SimCLR
 from simclr.modules import NT_Xent, get_resnet
-from simclr.modules.transformations.simclr import TransformsSimCLR, ImageVariations
+from simclr.modules.transformations.simclr import TransformsSimCLR
 from simclr.modules.sync_batchnorm import convert_model
 
 from model import load_optimizer, save_model
@@ -81,8 +81,9 @@ def main(gpu, args):
         train_dataset = data.ImagenetteDataset(
             args.dataset_dir + "/imagenette/train.csv",
             args.dataset_dir + "/imagenette/train",
-            num_variations=10,
-            transform=ImageVariations(),
+            num_variations=args.num_variations,
+            transform_type=args.transform_type,
+            transform=TransformsSimCLR(size=args.image_size),
         )
     else:
         raise NotImplementedError
@@ -139,7 +140,7 @@ def main(gpu, args):
 
     args.global_step = 0
     args.current_epoch = 0
-    for epoch in range(args.start_epoch, args.epochs):
+    for epoch in range(args.start_epoch, args.epochs+1):
         if train_sampler is not None:
             train_sampler.set_epoch(epoch)
 

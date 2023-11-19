@@ -1,11 +1,11 @@
 import numpy as np
-import torch
 import torchvision
 
 
 class TransformsSimCLR:
     """
-    A stochastic data augmentation module that transforms any given data example randomly
+    A stochastic data augmentation module that transforms any given data
+    example randomly
     resulting in two correlated views of the same example,
     denoted x ̃i and x ̃j, which we consider as a positive pair.
     """
@@ -18,7 +18,8 @@ class TransformsSimCLR:
         self.train_transform = torchvision.transforms.Compose(
             [
                 torchvision.transforms.RandomResizedCrop(size=size),
-                torchvision.transforms.RandomHorizontalFlip(),  # with 0.5 probability
+                # with 0.5 probability
+                torchvision.transforms.RandomHorizontalFlip(),
                 torchvision.transforms.RandomApply([color_jitter], p=0.8),
                 torchvision.transforms.RandomGrayscale(p=0.2),
                 torchvision.transforms.ToTensor(),
@@ -33,26 +34,26 @@ class TransformsSimCLR:
             ]
         )
 
-    def __call__(self, x):
-        return self.train_transform(x), self.train_transform(x)
-
-
-class ImageVariations:
-    """
-    Picks a random variation of the image, converts it to a tensor,
-    change the shape of the tensor to (C, H, W) and returns it.
-    """
-
-    def __init__(self):
         self.variation_transform = torchvision.transforms.Compose([
-                torchvision.transforms.ToTensor(),
+            torchvision.transforms.ToTensor(),
         ])
 
     def __call__(self, vars):
-        x, y = vars
-        # x = x.astype(np.float32)
-        # y = y.astype(np.float32)
-        # x = torch.from_numpy(np.transpose(x, (2, 0, 1)))
-        # y = torch.from_numpy(np.transpose(y, (2, 0, 1)))
-
-        return self.variation_transform(x), self.variation_transform(y)
+        x, y, z, type = vars
+        # Traditional SimCLR augmentations
+        if type == 0:
+            return self.train_transform(x), self.train_transform(x)
+        # Image Variation only
+        elif type == 1:
+            return self.variation_transform(x), self.variation_transform(y)
+        # Randomly choose between traditional SimCLR augmentations
+        # and Image Variation
+        elif type == 2:
+            a = np.random.random()
+            if a < 0.5:
+                return self.train_transform(x), self.train_transform(x)
+            else:
+                return self.variation_transform(y), self.variation_transform(z)
+        # One traditional SimCLR augmentation and one Image Variation
+        elif type == 3:
+            return self.train_transform(x), self.variation_transform(y)

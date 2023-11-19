@@ -10,6 +10,8 @@ dataset_dir: "./datasets"
 seed: 42 # sacred handles automatic seeding when passed in the config
 batch_size: 1024
 image_size: 224
+num_variations: 10
+transform_type: 0 # 0: SimCLR, 1: ImageVariation, 2: SimCLR or ImageVariation (randomly chosen) 3: ImageVariation + SimCLR
 start_epoch: 0
 epochs: 100
 # dataset: "CIFAR10" # STL10
