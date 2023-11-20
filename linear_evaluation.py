@@ -158,8 +158,8 @@ if __name__ == "__main__":
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
         test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenet-1pct/val.csv",
-            args.dataset_dir + "/imagenet-1pct/val",
+            args.dataset_dir + "/../imagenet/val.csv",
+            args.dataset_dir + "/../imagenet/val",
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
     elif args.dataset == "Imagenet-10pct":
@@ -169,8 +169,8 @@ if __name__ == "__main__":
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
         test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenet-10pct/val.csv",
-            args.dataset_dir + "/imagenet-10pct/val",
+            args.dataset_dir + "/../imagenet/val.csv",
+            args.dataset_dir + "/../imagenet/val",
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
     else:
