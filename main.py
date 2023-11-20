@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
     # Master address for distributed data parallel
     os.environ["MASTER_ADDR"] = "127.0.0.1"
-    os.environ["MASTER_PORT"] = "8000"
+    os.environ["MASTER_PORT"] = "8100"
 
     if not os.path.exists(args.model_path):
         os.makedirs(args.model_path)
