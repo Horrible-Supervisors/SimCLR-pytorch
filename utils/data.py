@@ -43,7 +43,7 @@ class ImagenetDataset(Dataset):
             idx = idx.tolist()
 
         img_name = os.path.join(self.root_dir,
-                                self.image_frame.iloc[idx, 0])
+                                str(self.image_frame.iloc[idx, 0]))
         image = Image.open(img_name)
         label = self.image_frame.iloc[idx, 1]
 
@@ -52,26 +52,26 @@ class ImagenetDataset(Dataset):
         elif self.transform_type == 1:
             a, b = np.random.choice(self.num_variations, 2, replace=False)
             var1_name = os.path.join(self.root_dir,
-                                     self.image_frame.iloc[idx, 2+a])
+                                     str(self.image_frame.iloc[idx, 2+a]))
             var1 = Image.open(var1_name)
             var2_name = os.path.join(self.root_dir,
-                                     self.image_frame.iloc[idx, 2+b])
+                                     str(self.image_frame.iloc[idx, 2+b]))
             var2 = Image.open(var2_name)
             image = self.transform((var1, var2, 0, 1))
         elif self.transform_type == 2:
             a, b = np.random.choice(self.num_variations, 2, replace=False)
             var1_name = os.path.join(self.root_dir,
-                                     self.image_frame.iloc[idx, 2+a])
+                                     str(self.image_frame.iloc[idx, 2+a]))
             var1 = Image.open(var1_name)
             var2_name = os.path.join(self.root_dir,
-                                     self.image_frame.iloc[idx, 2+b])
+                                     str(self.image_frame.iloc[idx, 2+b]))
             var2 = Image.open(var2_name)
             image = self.transform((image, var1, var2, 2))
         elif self.transform_type == 3:
             a = np.random.choice(self.num_variations, 1, replace=False)
             a = a[0]
             var1_name = os.path.join(self.root_dir,
-                                     self.image_frame.iloc[idx, 2+a])
+                                     str(self.image_frame.iloc[idx, 2+a]))
             var1 = Image.open(var1_name)
             image = self.transform((image, var1, 0, 3))
         else:
