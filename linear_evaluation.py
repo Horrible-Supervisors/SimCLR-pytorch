@@ -141,14 +141,36 @@ if __name__ == "__main__":
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
     elif args.dataset == "Imagenette":
-        train_dataset = data.ImagenetteDataset(
+        train_dataset = data.ImagenetDataset(
             args.dataset_dir + "/imagenette/train.csv",
             args.dataset_dir + "/imagenette/train",
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
-        test_dataset = data.ImagenetteDataset(
+        test_dataset = data.ImagenetDataset(
             args.dataset_dir + "/imagenette/val.csv",
             args.dataset_dir + "/imagenette/val",
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
+    elif args.dataset == "Imagenet-1pct":
+        train_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/imagenet-1pct/train.csv",
+            args.dataset_dir + "/imagenet-1pct/train",
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
+        test_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/imagenet-1pct/val.csv",
+            args.dataset_dir + "/imagenet-1pct/val",
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
+    elif args.dataset == "Imagenet-10pct":
+        train_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/imagenet-10pct/train.csv",
+            args.dataset_dir + "/imagenet-10pct/train",
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
+        test_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/imagenet-10pct/val.csv",
+            args.dataset_dir + "/imagenet-10pct/val",
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
     else:

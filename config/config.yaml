@@ -1,5 +1,5 @@
 # distributed training
-nodes: 1
+nodes: 2
 gpus: 1 # I recommend always assigning 1 GPU to 1 node
 nr: 0 # machine nr. in node (0 -- nodes - 1)
 dataparallel: 0 # Use DataParallel instead of DistributedDataParallel
@@ -14,8 +14,7 @@ num_variations: 10
 transform_type: 0 # 0: SimCLR, 1: ImageVariation, 2: SimCLR or ImageVariation (randomly chosen) 3: ImageVariation + SimCLR
 start_epoch: 0
 epochs: 100
-# dataset: "CIFAR10" # STL10
-dataset: "Imagenette"
+dataset: "Imagenet-1pct" # "Imagenet-1pct" or "Imagenette" or "Imagenet-10pct"
 pretrain: True 
 
 # model options

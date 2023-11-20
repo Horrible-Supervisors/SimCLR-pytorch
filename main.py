@@ -78,9 +78,25 @@ def main(gpu, args):
             transform=TransformsSimCLR(size=args.image_size),
         )
     elif args.dataset == "Imagenette":
-        train_dataset = data.ImagenetteDataset(
+        train_dataset = data.ImagenetDataset(
             args.dataset_dir + "/imagenette/train.csv",
             args.dataset_dir + "/imagenette/train",
+            num_variations=args.num_variations,
+            transform_type=args.transform_type,
+            transform=TransformsSimCLR(size=args.image_size),
+        )
+    elif args.dataset == "Imagenet-1pct":
+        train_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/imagenet-1pct/train.csv",
+            args.dataset_dir + "/imagenet-1pct/train",
+            num_variations=args.num_variations,
+            transform_type=args.transform_type,
+            transform=TransformsSimCLR(size=args.image_size),
+        )
+    elif args.dataset == "Imagenet-10pct":
+        train_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/imagenet-10pct/train.csv",
+            args.dataset_dir + "/imagenet-10pct/train",
             num_variations=args.num_variations,
             transform_type=args.transform_type,
             transform=TransformsSimCLR(size=args.image_size),

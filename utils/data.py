@@ -10,8 +10,8 @@ COUNT_IMAGENETTE_CLASSES = 10
 COUNT_MAX_NEG_SAMPLE_VARIATIONS = 10
 
 
-class ImagenetteDataset(Dataset):
-    """Imagenette dataset."""
+class ImagenetDataset(Dataset):
+    """Imagenet dataset."""
 
     def __init__(self, csv_file, root_dir, num_variations,
                  transform_type, transform):
