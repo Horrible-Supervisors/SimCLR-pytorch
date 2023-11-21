@@ -155,7 +155,7 @@ def main(gpu, args):
         writer = SummaryWriter()
 
     args.global_step = 0
-    args.current_epoch = 0
+    args.current_epoch = args.start_epoch
     for epoch in range(args.start_epoch, args.epochs+1):
         if train_sampler is not None:
             train_sampler.set_epoch(epoch)
