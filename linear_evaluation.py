@@ -217,7 +217,7 @@ if __name__ == "__main__":
     simclr_model.eval()
 
     # Logistic Regression
-    n_classes = 10  # CIFAR-10 / STL-10
+    n_classes = args.n_classes
     model = LogisticRegression(simclr_model.n_features, n_classes)
     model = model.to(args.device)
 

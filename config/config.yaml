@@ -33,4 +33,5 @@ reload: False
 
 # logistic regression options
 logistic_batch_size: 256
+n_classes: 1000
 logistic_epochs: 500
