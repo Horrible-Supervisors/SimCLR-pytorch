@@ -164,8 +164,8 @@ if __name__ == "__main__":
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
         test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/../imagenet-val/val.csv",
-            args.dataset_dir + "/../imagenet-val/val",
+            args.dataset_dir + "/imagenet-val/val.csv",
+            args.dataset_dir + "/imagenet-val/val",
             num_variations=0,
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
@@ -179,8 +179,8 @@ if __name__ == "__main__":
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
         test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/../imagenet-val/val.csv",
-            args.dataset_dir + "/../imagenet-val/val",
+            args.dataset_dir + "/imagenet-val/val.csv",
+            args.dataset_dir + "/imagenet-val/val",
             num_variations=0,
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
