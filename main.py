@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-import torchvision
+# import torchvision
 import argparse
 
 # distributed training
@@ -14,13 +14,13 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 
 # SimCLR
-from simclr import SimCLR
-from simclr.modules import NT_Xent, get_resnet, NT_Xent_With_Neg_Samples
-from simclr.modules.transformations import TransformsSimCLR
-from simclr.modules.sync_batchnorm import convert_model
+# from simclr import SimCLR
+# from simclr.modules import NT_Xent, get_resnet, NT_Xent_With_Neg_Samples
+# from simclr.modules.transformations import TransformsSimCLR
+# from simclr.modules.sync_batchnorm import convert_model
 
-from model import load_optimizer, save_model
-from utils import yaml_config_hook, data
+# from model import load_optimizer, save_model
+from utils import yaml_config_hook, data, DataManipulator
 
 
 def train(args, train_loader, model, criterion, optimizer, writer,
@@ -108,6 +108,14 @@ def main(gpu, args):
         train_dataset = data.ImagenetDataset(
             args.dataset_dir + "/imagenet-10pct/train.csv",
             args.dataset_dir + "/imagenet-10pct/train",
+            num_variations=args.num_variations,
+            transform_type=args.transform_type,
+            transform=TransformsSimCLR(size=args.image_size),
+        )
+    elif args.dataset == "Imagenet":
+        train_dataset = data.ImagenetDataset(
+            args.train_csv,
+            args.dataset_dir + "/imagenet/train",
             num_variations=args.num_variations,
             transform_type=args.transform_type,
             transform=TransformsSimCLR(size=args.image_size),
@@ -231,23 +239,37 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Master address for distributed data parallel
-    os.environ["MASTER_ADDR"] = "127.0.0.1"
-    os.environ["MASTER_PORT"] = "8100"
+    if args.dataset == "Imagenet":
+        train_csv = f"/imagenet/train-{args.n_classes}-{args.n_img_class}.csv"
+        args.train_csv = args.dataset_dir + train_csv
+        n_img_class_val = min(int(args.n_img_class * 0.25), 50)
+        val_csv = f"/imagenet/val-{args.n_classes}-{n_img_class_val}.csv"
+        args.val_csv = args.dataset_dir + val_csv
 
-    if not os.path.exists(args.model_path):
-        os.makedirs(args.model_path)
+        if not os.path.exists(train_csv):
+            manipulator = DataManipulator(
+                args.dataset_dir + "/imagenet/train.csv",
+                args.dataset_dir + "/imagenet/val.csv",
+                args.n_classes, args.n_img_class, n_img_class_val)
+            manipulator.create_csv(args.train_csv, args.val_csv, args.seed)
 
-    args.device = torch.device(
-        "cuda:0" if torch.cuda.is_available() else "cpu")
-    args.num_gpus = torch.cuda.device_count()
-    args.world_size = args.gpus * args.nodes
+    # # Master address for distributed data parallel
+    # os.environ["MASTER_ADDR"] = "127.0.0.1"
+    # os.environ["MASTER_PORT"] = "8100"
 
-    if args.nodes > 1:
-        print(
-            f"""Training with {args.nodes} nodes, waiting until
-            all nodes join before starting training"""
-        )
-        mp.spawn(main, args=(args,), nprocs=args.gpus, join=True)
-    else:
-        main(0, args)
+    # if not os.path.exists(args.model_path):
+    #     os.makedirs(args.model_path)
+
+    # args.device = torch.device(
+    #     "cuda:0" if torch.cuda.is_available() else "cpu")
+    # args.num_gpus = torch.cuda.device_count()
+    # args.world_size = args.gpus * args.nodes
+
+    # if args.nodes > 1:
+    #     print(
+    #         f"""Training with {args.nodes} nodes, waiting until
+    #         all nodes join before starting training"""
+    #     )
+    #     mp.spawn(main, args=(args,), nprocs=args.gpus, join=True)
+    # else:
+    #     main(0, args)

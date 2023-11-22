@@ -112,6 +112,13 @@ if __name__ == "__main__":
         parser.add_argument(f"--{k}", default=v, type=type(v))
 
     args = parser.parse_args()
+
+    if args.dataset == "Imagenet":
+        train_csv = f"/imagenet/train-{args.n_classes}-{args.n_img_class}.csv"
+        args.train_csv = args.dataset_dir + train_csv
+        val_csv = f"/imagenet/val-{args.n_classes}-{args.n_img_class}.csv"
+        args.val_csv = args.dataset_dir + val_csv
+
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if args.dataset == "STL10":
@@ -181,6 +188,21 @@ if __name__ == "__main__":
         test_dataset = data.ImagenetDataset(
             args.dataset_dir + "/imagenet-val/val.csv",
             args.dataset_dir + "/imagenet-val/val",
+            num_variations=0,
+            transform_type=4,
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
+    elif args.dataset == "Imagenet":
+        train_dataset = data.ImagenetDataset(
+            args.train_csv,
+            args.dataset_dir + "/imagenet/train",
+            num_variations=0,
+            transform_type=4,
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
+        test_dataset = data.ImagenetDataset(
+            args.val_csv,
+            args.dataset_dir + "/imagenet/val",
             num_variations=0,
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,

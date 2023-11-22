@@ -134,6 +134,6 @@ class NegativeImagenetteDataset(Dataset):
         class_index = int(self.class_indices[int(idx/self.num_variations)])
         variation_idx = int(self.variation_indices[idx])
         img_name = os.path.join(self.images_folder,
-                                str(class_index) + '_' + str(variation_idx) + '.png')
+                                f"{class_index}_{variation_idx}.png")
         image = Image.open(img_name)
         return self.transform(image), ''
