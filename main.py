@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-# import torchvision
+import torchvision
 import argparse
 
 # distributed training
@@ -14,12 +14,12 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 
 # SimCLR
-# from simclr import SimCLR
-# from simclr.modules import NT_Xent, get_resnet, NT_Xent_With_Neg_Samples
-# from simclr.modules.transformations import TransformsSimCLR
-# from simclr.modules.sync_batchnorm import convert_model
+from simclr import SimCLR
+from simclr.modules import NT_Xent, get_resnet, NT_Xent_With_Neg_Samples
+from simclr.modules.transformations import TransformsSimCLR
+from simclr.modules.sync_batchnorm import convert_model
 
-# from model import load_optimizer, save_model
+from model import load_optimizer, save_model
 from utils import yaml_config_hook, data, DataManipulator
 
 
@@ -252,23 +252,23 @@ if __name__ == "__main__":
                 args.n_classes, args.n_img_class)
             manipulator.create_csv(args.train_csv, args.val_csv, args.seed)
 
-    # # Master address for distributed data parallel
-    # os.environ["MASTER_ADDR"] = "127.0.0.1"
-    # os.environ["MASTER_PORT"] = "8100"
+    # Master address for distributed data parallel
+    os.environ["MASTER_ADDR"] = "127.0.0.1"
+    os.environ["MASTER_PORT"] = "8100"
 
-    # if not os.path.exists(args.model_path):
-    #     os.makedirs(args.model_path)
+    if not os.path.exists(args.model_path):
+        os.makedirs(args.model_path)
 
-    # args.device = torch.device(
-    #     "cuda:0" if torch.cuda.is_available() else "cpu")
-    # args.num_gpus = torch.cuda.device_count()
-    # args.world_size = args.gpus * args.nodes
+    args.device = torch.device(
+        "cuda:0" if torch.cuda.is_available() else "cpu")
+    args.num_gpus = torch.cuda.device_count()
+    args.world_size = args.gpus * args.nodes
 
-    # if args.nodes > 1:
-    #     print(
-    #         f"""Training with {args.nodes} nodes, waiting until
-    #         all nodes join before starting training"""
-    #     )
-    #     mp.spawn(main, args=(args,), nprocs=args.gpus, join=True)
-    # else:
-    #     main(0, args)
+    if args.nodes > 1:
+        print(
+            f"""Training with {args.nodes} nodes, waiting until
+            all nodes join before starting training"""
+        )
+        mp.spawn(main, args=(args,), nprocs=args.gpus, join=True)
+    else:
+        main(0, args)
