@@ -8,7 +8,7 @@ dataset_dir: "./datasets"
 
 # train options
 seed: 42 # sacred handles automatic seeding when passed in the config
-batch_size: 512
+batch_size: 256
 image_size: 224
 num_variations: 10
 transform_type: 0 # 0: SimCLR, 1: ImageVariation, 2: SimCLR or ImageVariation (randomly chosen) 3: ImageVariation + SimCLR
@@ -17,7 +17,7 @@ epochs: 100
 dataset: "Imagenette" # "Imagenet-1pct" or "Imagenette" or "Imagenet-10pct"
 pretrain: True 
 include_neg_samples: False
-ns_batch_size: 1024
+ns_batch_size: 512 # number of negative samples per batch
 
 # model options
 resnet: "resnet18"

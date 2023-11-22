@@ -22,9 +22,9 @@ from simclr.modules.sync_batchnorm import convert_model
 from model import load_optimizer, save_model
 from utils import yaml_config_hook, data
 
-import torchvision
 
-def train(args, train_loader, model, criterion, optimizer, writer, neg_samples_loader):
+def train(args, train_loader, model, criterion, optimizer, writer,
+          neg_samples_loader):
     loss_epoch = 0
     for step, ((x_i, x_j), _) in enumerate(train_loader):
 
@@ -44,7 +44,7 @@ def train(args, train_loader, model, criterion, optimizer, writer, neg_samples_l
         else:
             h_i, h_j, z_i, z_j = model(x_i, x_j)
             loss = criterion(z_i, z_j)
-        
+
         loss.backward()
 
         optimizer.step()
@@ -114,24 +114,26 @@ def main(gpu, args):
         )
     else:
         raise NotImplementedError
-    
+
     neg_samples_loader = None
-    if args.include_neg_samples ==  True:
+    if args.include_neg_samples:
         if args.dataset == "Imagenette":
             neg_samples_dataset = data.NegativeImagenetteDataset(
-                images_folder="/imagenette/negative_samples/", 
-                batch_size=neg_samples_dataset.batch_size, 
+                images_folder="/imagenette/negative_samples/",
+                batch_size=neg_samples_dataset.batch_size,
                 transform=torchvision.transforms.Compose(
-                            [
-                                torchvision.transforms.Resize(size=args.image_size),
-                                torchvision.transforms.CenterCrop(size=args.image_size),
-                                torchvision.transforms.ToTensor(),
-                            ])
-                )
+                    [
+                        torchvision.transforms.Resize(
+                            size=args.image_size),
+                        torchvision.transforms.CenterCrop(
+                            size=args.image_size),
+                        torchvision.transforms.ToTensor(),
+                    ])
+            )
         neg_samples_loader = torch.utils.data.DataLoader(
-            neg_samples_dataset, 
-            batch_size = neg_samples_dataset.batch_size,
-            num_workers = args.workers
+            neg_samples_dataset,
+            batch_size=neg_samples_dataset.batch_size,
+            num_workers=args.workers
         )
 
     if args.nodes > 1:
@@ -170,7 +172,10 @@ def main(gpu, args):
     if not args.include_neg_samples:
         criterion = NT_Xent(args.batch_size, args.temperature, args.world_size)
     else:
-        criterion = NT_Xent_With_Neg_Samples(args.batch_size, args.ns_batch_size, args.temperature, args.world_size)
+        criterion = NT_Xent_With_Neg_Samples(
+            args.batch_size, args.ns_batch_size,
+            args.temperature, args.world_size
+        )
 
     # DDP / DP
     if args.dataparallel:
