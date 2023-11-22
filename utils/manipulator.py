@@ -9,7 +9,7 @@ class DataManipulator():
     """
 
     def __init__(self, train_csv, val_csv, num_classes,
-                 num_images_per_class_train, num_images_per_class_val):
+                 num_images_per_class_train):
         """
         train_csv: csv file containing image names, labels and variations
         val_csv: csv file containing image names and labels for validation
@@ -21,7 +21,8 @@ class DataManipulator():
         self.val_frame = pd.read_csv(val_csv)
         self.num_classes = num_classes
         self.num_images_per_class_train = num_images_per_class_train
-        self.num_images_per_class_val = num_images_per_class_val
+        self.num_images_per_class_val = min(
+            num_images_per_class_train * 0.25, 50)
 
     def create_csv(self, train_csv, val_csv, seed):
         """
@@ -41,12 +42,15 @@ class DataManipulator():
         df_val = pd.DataFrame()
         for cls in classes:
             filtered_train = self.train_frame[self.train_frame["label"] == cls]
+            len_sample = min(len(filtered_train),
+                             self.num_images_per_class_train)
             sampled_train = filtered_train.sample(
-                self.num_images_per_class_train)
+                len_sample, random_state=seed)
             df_train = pd.concat([df_train, sampled_train], axis=0)
 
             filtered_val = self.val_frame[self.val_frame["label"] == cls]
-            sampled_val = filtered_val.sample(self.num_images_per_class_val)
+            sampled_val = filtered_val.sample(
+                self.num_images_per_class_val, random_state=seed)
             df_val = pd.concat([df_val, sampled_val], axis=0)
 
         df_train = df_train.sort_values(

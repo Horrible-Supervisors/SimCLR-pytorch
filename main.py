@@ -242,15 +242,14 @@ if __name__ == "__main__":
     if args.dataset == "Imagenet":
         train_csv = f"/imagenet/train-{args.n_classes}-{args.n_img_class}.csv"
         args.train_csv = args.dataset_dir + train_csv
-        n_img_class_val = min(int(args.n_img_class * 0.25), 50)
-        val_csv = f"/imagenet/val-{args.n_classes}-{n_img_class_val}.csv"
+        val_csv = f"/imagenet/val-{args.n_classes}-{args.n_img_class}.csv"
         args.val_csv = args.dataset_dir + val_csv
 
         if not os.path.exists(train_csv):
             manipulator = DataManipulator(
                 args.dataset_dir + "/imagenet/train.csv",
                 args.dataset_dir + "/imagenet/val.csv",
-                args.n_classes, args.n_img_class, n_img_class_val)
+                args.n_classes, args.n_img_class)
             manipulator.create_csv(args.train_csv, args.val_csv, args.seed)
 
     # # Master address for distributed data parallel
