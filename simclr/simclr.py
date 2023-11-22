@@ -27,10 +27,17 @@ class SimCLR(nn.Module):
             nn.Linear(self.n_features, projection_dim, bias=False),
         )
 
-    def forward(self, x_i, x_j):
+    def forward(self, x_i, x_j, ns=None):
         h_i = self.encoder(x_i)
         h_j = self.encoder(x_j)
+        if ns is not None:
+            h_ns = self.encoder(ns)
 
         z_i = self.projector(h_i)
         z_j = self.projector(h_j)
+        if ns is not None:
+            z_ns = self.projector(h_ns)
+            return h_i, h_j, h_ns, z_i, z_j, z_ns
+
         return h_i, h_j, z_i, z_j
+

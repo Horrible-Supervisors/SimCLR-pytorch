@@ -85,7 +85,7 @@ class NegativeImagenetteDataset(Dataset):
     # Obtaining negative image variations for all class labels
     # in Imagenette dataset
 
-    def __init__(self, images_folder, batch_size) -> None:
+    def __init__(self, images_folder, batch_size, transform) -> None:
         # Expectations:
         # Image_folder exists and contains images for all class labels
         # (No assert, but this will crash the program later)
@@ -97,6 +97,7 @@ class NegativeImagenetteDataset(Dataset):
 
         self.images_folder = images_folder
         self.batch_size = batch_size
+        self.transform = transform
         assert len(
             [file_name for file_name in os.listdir(images_folder)]
         ) >= self.batch_size, \
@@ -107,15 +108,6 @@ class NegativeImagenetteDataset(Dataset):
         if self.num_variations == 0:
             self.num_variations = 1
         self.randomize_samples()
-
-        print('max_classes = ', self.max_classes)
-        print('max_variations = ', self.max_variations)
-        print('images_folder = ', self.images_folder)
-        print('batch_size = ', self.batch_size)
-        print('num_variations = ', self.num_variations)
-        print('len = ', self.len)
-        print('class_indices = ', self.class_indices)
-        print('variation_indices = ', self.variation_indices)
 
     def __len__(self):
         return self.batch_size
@@ -139,10 +131,9 @@ class NegativeImagenetteDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        class_index = self.class_indices[int(idx/len(self.class_indices))]
-        variation_idx = self.variation_indices[idx]
+        class_index = int(self.class_indices[int(idx/self.num_variations)])
+        variation_idx = int(self.variation_indices[idx])
         img_name = os.path.join(self.images_folder,
-                                str(class_index) + '_' + str(variation_idx))
-        print(img_name)
+                                str(class_index) + '_' + str(variation_idx) + '.png')
         image = Image.open(img_name)
-        return image
+        return self.transform(image), ''
