@@ -12,6 +12,7 @@ batch_size: 1024
 image_size: 224
 n_classes: 100
 n_img_class: 1000
+n_img_samples_per_class: 10 # Number of negative images generated per class.
 num_variations: 10
 transform_type: 0 # 0: SimCLR, 1: ImageVariation, 2: SimCLR or ImageVariation (randomly chosen) 3: ImageVariation + SimCLR
 start_epoch: 0

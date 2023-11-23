@@ -85,15 +85,15 @@ class NegativeImagenetteDataset(Dataset):
     # Obtaining negative image variations for all class labels
     # in Imagenette dataset
 
-    def __init__(self, images_folder, batch_size, transform) -> None:
+    def __init__(self, images_folder, batch_size, n_img_class, n_img_samples_per_class, transform) -> None:
         # Expectations:
         # Image_folder exists and contains images for all class labels
         # (No assert, but this will crash the program later)
         # Batch size is less than or equal to the number of
         # available image files (Enforced by assert)
         super().__init__()
-        self.max_classes = COUNT_IMAGENETTE_CLASSES
-        self.max_variations = COUNT_MAX_NEG_SAMPLE_VARIATIONS
+        self.max_classes = n_img_class
+        self.max_variations = n_img_samples_per_class
 
         self.images_folder = images_folder
         self.batch_size = batch_size

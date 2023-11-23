@@ -71,7 +71,7 @@ class NT_Xent_With_Neg_Samples(nn.Module):
 
     def mask_correlated_samples(self, batch_size,
                                 neg_sam_batch_size, world_size):
-        N = (2 * batch_size + neg_sam_batch_size) * world_size
+        N = 2 * batch_size * world_size
         mask = torch.ones((N, N), dtype=bool)
         mask = mask.fill_diagonal_(0)
         for i in range(batch_size * world_size):
@@ -86,16 +86,16 @@ class NT_Xent_With_Neg_Samples(nn.Module):
         we treat the other 2(N-1) augmented examples within
         a minibatch as negative examples.
         """
-        N = (2 * self.batch_size + self.neg_sam_batch_size) * self.world_size
+        N = 2 * self.batch_size * self.world_size
 
         if self.world_size > 1:
             z_i = torch.cat(GatherLayer.apply(z_i), dim=0)
             z_j = torch.cat(GatherLayer.apply(z_j), dim=0)
             z_neg = torch.cat(GatherLayer.apply(z_neg), dim=0)
-        z = torch.cat((z_i, z_j, z_neg), dim=0)
+        z = torch.cat((z_i, z_j), dim=0)
 
-        sim = self.similarity_f(z.unsqueeze(
-            1), z.unsqueeze(0)) / self.temperature
+        sim = self.similarity_f(z.unsqueeze(1), z.unsqueeze(0)) / self.temperature
+        neg_sim = self.similarity_f(z.unsqueeze(1), z_neg.unsqueeze(0)) / self.temperature
 
         sim_i_j = torch.diag(sim, self.batch_size * self.world_size)
         sim_j_i = torch.diag(sim, -self.batch_size * self.world_size)
@@ -107,10 +107,11 @@ class NT_Xent_With_Neg_Samples(nn.Module):
             sim_i_j[:self.batch_size * self.world_size],
             sim_j_i[:self.batch_size * self.world_size]),
             dim=0).reshape(sample_count, 1)
-        negative_samples = sim[self.mask].reshape(sample_count, -1)
+        # negative_samples = sim[self.mask].reshape(sample_count, -1)
+        negative_samples = torch.cat((sim[self.mask].reshape(sample_count, -1), neg_sim), dim=1)
 
         labels = torch.zeros(sample_count).to(positive_samples.device).long()
         logits = torch.cat((positive_samples, negative_samples), dim=1)
         loss = self.criterion(logits, labels)
-        loss /= N
+        loss /= (N + neg_sim.shape[1])
         return loss

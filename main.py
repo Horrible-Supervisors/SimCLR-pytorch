@@ -127,8 +127,10 @@ def main(gpu, args):
     if args.include_neg_samples:
         if args.dataset == "Imagenette":
             neg_samples_dataset = data.NegativeImagenetteDataset(
-                images_folder="/imagenette/negative_samples/",
-                batch_size=neg_samples_dataset.batch_size,
+                images_folder=args.dataset_dir + "/imagenette/negative_samples/",
+                batch_size=args.ns_batch_size,
+                n_img_class=args.n_img_class,
+                n_img_samples_per_class=args.n_img_samples_per_class,
                 transform=torchvision.transforms.Compose(
                     [
                         torchvision.transforms.Resize(
