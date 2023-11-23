@@ -7,5 +7,6 @@ build/
 dist/
 simclr.egg-info
 lightning_logs/
+results/
 
 .DS_Store

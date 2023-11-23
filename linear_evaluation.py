@@ -262,6 +262,11 @@ if __name__ == "__main__":
         print(f"""Epoch [{epoch}/{args.logistic_epochs}]\t """
               f"""Loss: {loss_epoch / len(arr_train_loader)}\t """
               f"""Accuracy: {accuracy_epoch / len(arr_train_loader)}""")
+        if epoch % 100 == 0:
+            loss_epoch, accuracy_epoch = test(
+                args, arr_test_loader, model, criterion)
+            print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
+                  f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}""")
 
     # final testing
     loss_epoch, accuracy_epoch = test(args, arr_test_loader, model, criterion)
