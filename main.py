@@ -225,8 +225,8 @@ def main(gpu, args):
             writer.add_scalar("Misc/learning_rate", lr, epoch)
             print(
                 f"""Epoch [{epoch}/{args.epochs}]\t Loss: {
-                    loss_epoch / len(train_loader)}\t lr: {round(lr, 5)}\n
-                    Epoch Time: {end - start} seconds"""
+                    loss_epoch / len(train_loader)}\t lr: {
+                        round(lr, 5)}\nEpoch Time: {end - start} seconds"""
             )
             args.current_epoch += 1
 
