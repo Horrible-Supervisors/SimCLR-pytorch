@@ -1,5 +1,5 @@
 # distributed training
-nodes: 2
+nodes: 1
 gpus: 1 # I recommend always assigning 1 GPU to 1 node
 nr: 0 # machine nr. in node (0 -- nodes - 1)
 dataparallel: 0 # Use DataParallel instead of DistributedDataParallel
@@ -8,15 +8,15 @@ dataset_dir: "./datasets"
 
 # train options
 seed: 42 # sacred handles automatic seeding when passed in the config
-batch_size: 256
+batch_size: 1024
 image_size: 224
-n_classes: 10
-n_img_class: 10
+n_classes: 100
+n_img_class: 1000
 num_variations: 10
 transform_type: 0 # 0: SimCLR, 1: ImageVariation, 2: SimCLR or ImageVariation (randomly chosen) 3: ImageVariation + SimCLR
 start_epoch: 0
 epochs: 100
-dataset: "Imagenet" # "Imagenet" or "Imagenet-1pct" or "Imagenet-10pct" or "Imagenette" 
+dataset: "HS-Imagenet" # "HS-Imagenet" or "Imagenet-1pct" or "Imagenet-10pct" or "Imagenette" 
 pretrain: True 
 include_neg_samples: False
 ns_batch_size: 512 # number of negative samples per batch
@@ -31,7 +31,7 @@ weight_decay: 1.0e-6 # "optimized using LARS [...] and weight decay of 10−6"
 temperature: 0.5 # see appendix B.7.: Optimal temperature under different batch sizes
 
 # reload options
-model_path: "save" # set to the directory containing `checkpoint_##.tar` 
+model_path: "save-ss-transform0-batch1024-cls100-imgcls1000" # set to the directory containing `checkpoint_##.tar` 
 epoch_num: 100 # set to checkpoint number
 reload: False
 

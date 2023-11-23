@@ -1,8 +1,9 @@
+import argparse
 import os
 import numpy as np
 import torch
 import torchvision
-import argparse
+import time
 
 # distributed training
 import torch.distributed as dist
@@ -27,7 +28,6 @@ def train(args, train_loader, model, criterion, optimizer, writer,
           neg_samples_loader):
     loss_epoch = 0
     for step, ((x_i, x_j), _) in enumerate(train_loader):
-
         ns = None
         if neg_samples_loader is not None:
             neg_samples_loader.dataset.randomize_samples()
@@ -112,7 +112,7 @@ def main(gpu, args):
             transform_type=args.transform_type,
             transform=TransformsSimCLR(size=args.image_size),
         )
-    elif args.dataset == "Imagenet":
+    elif args.dataset == "HS-Imagenet":
         train_dataset = data.ImagenetDataset(
             args.train_csv,
             args.dataset_dir + "/imagenet/train",
@@ -203,6 +203,7 @@ def main(gpu, args):
     args.global_step = 0
     args.current_epoch = args.start_epoch
     for epoch in range(args.start_epoch, args.epochs+1):
+        start = time.time()
         if train_sampler is not None:
             train_sampler.set_epoch(epoch)
 
@@ -215,14 +216,15 @@ def main(gpu, args):
 
         if args.nr == 0 and epoch % 10 == 0:
             save_model(args, model, optimizer)
-
+        end = time.time()
         if args.nr == 0:
             writer.add_scalar("Loss/train", loss_epoch /
                               len(train_loader), epoch)
             writer.add_scalar("Misc/learning_rate", lr, epoch)
             print(
                 f"""Epoch [{epoch}/{args.epochs}]\t Loss: {
-                    loss_epoch / len(train_loader)}\t lr: {round(lr, 5)}"""
+                    loss_epoch / len(train_loader)}\t lr: {round(lr, 5)}\n
+                    Epoch Time: {end - start} seconds"""
             )
             args.current_epoch += 1
 
@@ -238,6 +240,8 @@ if __name__ == "__main__":
         parser.add_argument(f"--{k}", default=v, type=type(v))
 
     args = parser.parse_args()
+
+    t_start = time.time()
 
     if args.dataset == "Imagenet":
         train_csv = f"/imagenet/train-{args.n_classes}-{args.n_img_class}.csv"
@@ -272,3 +276,6 @@ if __name__ == "__main__":
         mp.spawn(main, args=(args,), nprocs=args.gpus, join=True)
     else:
         main(0, args)
+
+    t_end = time.time()
+    print(f"Total time: {t_end - t_start} seconds")

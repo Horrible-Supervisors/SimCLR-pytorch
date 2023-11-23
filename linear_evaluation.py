@@ -192,7 +192,7 @@ if __name__ == "__main__":
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
-    elif args.dataset == "Imagenet":
+    elif args.dataset == "HS-Imagenet":
         train_dataset = data.ImagenetDataset(
             args.train_csv,
             args.dataset_dir + "/imagenet/train",
