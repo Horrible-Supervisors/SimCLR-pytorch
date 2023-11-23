@@ -243,7 +243,7 @@ if __name__ == "__main__":
 
     t_start = time.time()
 
-    if args.dataset == "Imagenet":
+    if args.dataset == "HS-Imagenet":
         train_csv = f"/imagenet/train-{args.n_classes}-{args.n_img_class}.csv"
         args.train_csv = args.dataset_dir + train_csv
         val_csv = f"/imagenet/val-{args.n_classes}-{args.n_img_class}.csv"
