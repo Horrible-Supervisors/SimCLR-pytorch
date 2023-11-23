@@ -255,7 +255,8 @@ if __name__ == "__main__":
             manipulator = DataManipulator(
                 args.dataset_dir + "/imagenet/train.csv",
                 args.dataset_dir + "/imagenet/val.csv",
-                args.n_classes, args.n_img_class)
+                args.n_classes, args.n_img_class,
+                args.dataset_dir + "/imagenet/")
             manipulator.create_csv(args.train_csv, args.val_csv, args.seed)
 
     # Master address for distributed data parallel
