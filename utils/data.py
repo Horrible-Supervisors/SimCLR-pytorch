@@ -1,4 +1,4 @@
-import os
+import os, time
 
 import numpy as np
 import pandas as pd
@@ -85,7 +85,9 @@ class NegativeImagenetteDataset(Dataset):
     # Obtaining negative image variations for all class labels
     # in Imagenette dataset
 
-    def __init__(self, images_folder, batch_size, n_img_class, n_img_samples_per_class, transform) -> None:
+    def __init__(self, images_folder, batch_size, n_img_class, 
+                 n_img_samples_per_class, epochs, train_steps, 
+                 steps_per_epoch, transform) -> None:
         # Expectations:
         # Image_folder exists and contains images for all class labels
         # (No assert, but this will crash the program later)
@@ -94,10 +96,18 @@ class NegativeImagenetteDataset(Dataset):
         super().__init__()
         self.max_classes = n_img_class
         self.max_variations = n_img_samples_per_class
+        self.epochs = epochs
+        self.train_steps = train_steps
+        self.steps_per_epoch = steps_per_epoch
 
         self.images_folder = images_folder
         self.batch_size = batch_size
         self.transform = transform
+
+        # self.size = self.batch_size * self.train_steps
+        self.size = self.batch_size * self.steps_per_epoch
+        self.index_list = []
+
         assert len(
             [file_name for file_name in os.listdir(images_folder)]
         ) >= self.batch_size, \
@@ -107,10 +117,22 @@ class NegativeImagenetteDataset(Dataset):
         self.num_variations = int(self.batch_size/self.max_classes)
         if self.num_variations == 0:
             self.num_variations = 1
-        self.randomize_samples()
+        # self.randomize_samples()
+        self.get_index_array()
 
     def __len__(self):
-        return self.batch_size
+        return self.size
+    
+    def get_index_array(self):
+        class_arr = np.arange(self.max_classes)
+        variation_arr = np.arange(self.max_variations)
+        selected_variations = np.random.choice(variation_arr, size=(self.size, self.num_variations)).flatten()
+        selected_class_list = []
+        for i in range(self.steps_per_epoch):
+            selected_classes = np.random.choice(class_arr, size=min(self.max_classes, self.batch_size), replace=False)
+            selected_class_list.append(selected_classes)
+        selected_classes = np.array(selected_class_list).flatten()
+        self.index_arr = np.stack((selected_classes, selected_variations), axis=1)
 
     def randomize_samples(self):
         # Meant to be called before every epoch
@@ -131,8 +153,10 @@ class NegativeImagenetteDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        class_index = int(self.class_indices[int(idx/self.num_variations)])
-        variation_idx = int(self.variation_indices[idx])
+        class_index = int(self.index_arr[idx,0])
+        variation_idx = int(self.index_arr[idx,1])
+        # class_index = int(self.class_indices[int(idx/self.num_variations)])
+        # variation_idx = int(self.variation_indices[idx])
         img_name = os.path.join(self.images_folder,
                                 f"{class_index}_{variation_idx}.png")
         image = Image.open(img_name)

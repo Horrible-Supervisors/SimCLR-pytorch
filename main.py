@@ -26,12 +26,17 @@ from utils import yaml_config_hook, data, DataManipulator
 
 def train(args, train_loader, model, criterion, optimizer, writer,
           neg_samples_loader):
+
+    if neg_samples_loader is not None:
+        iter_obj = iter(neg_samples_loader)
+
     loss_epoch = 0
     for step, ((x_i, x_j), _) in enumerate(train_loader):
+        # print(f"step: {step}", flush=True)
         ns = None
         if neg_samples_loader is not None:
-            neg_samples_loader.dataset.randomize_samples()
-            ns = next(iter(neg_samples_loader))[0]
+            # neg_samples_loader.dataset.randomize_samples()
+            ns = next(iter_obj)[0]
 
         optimizer.zero_grad()
         x_i = x_i.cuda(non_blocking=True)
@@ -123,29 +128,6 @@ def main(gpu, args):
     else:
         raise NotImplementedError
 
-    neg_samples_loader = None
-    if args.include_neg_samples:
-        if args.dataset == "Imagenette":
-            neg_samples_dataset = data.NegativeImagenetteDataset(
-                images_folder=args.dataset_dir + "/imagenette/negative_samples/",
-                batch_size=args.ns_batch_size,
-                n_img_class=args.n_img_class,
-                n_img_samples_per_class=args.n_img_samples_per_class,
-                transform=torchvision.transforms.Compose(
-                    [
-                        torchvision.transforms.Resize(
-                            size=args.image_size),
-                        torchvision.transforms.CenterCrop(
-                            size=args.image_size),
-                        torchvision.transforms.ToTensor(),
-                    ])
-            )
-        neg_samples_loader = torch.utils.data.DataLoader(
-            neg_samples_dataset,
-            batch_size=neg_samples_dataset.batch_size,
-            num_workers=args.workers
-        )
-
     if args.nodes > 1:
         train_sampler = torch.utils.data.distributed.DistributedSampler(
             train_dataset, num_replicas=args.world_size,
@@ -162,6 +144,34 @@ def main(gpu, args):
         num_workers=args.workers,
         sampler=train_sampler,
     )
+
+    train_steps = len(train_dataset) * args.epochs // args.batch_size + 1
+    steps_per_epoch = int(train_steps / 100)
+
+    neg_samples_loader = None
+    if args.include_neg_samples:
+        if args.dataset == "Imagenette":
+            neg_samples_dataset = data.NegativeImagenetteDataset(
+                images_folder=args.dataset_dir + "/imagenette/negative_samples/",
+                batch_size=args.ns_batch_size,
+                n_img_class=args.n_img_class,
+                n_img_samples_per_class=args.n_img_samples_per_class,
+                epochs=args.epochs,
+                train_steps=train_steps,
+                steps_per_epoch=steps_per_epoch,
+                transform=torchvision.transforms.Compose([
+                    torchvision.transforms.Resize(
+                        size=args.image_size),
+                    torchvision.transforms.CenterCrop(
+                        size=args.image_size),
+                    torchvision.transforms.ToTensor(),
+                ])
+            )
+        neg_samples_loader = torch.utils.data.DataLoader(
+            neg_samples_dataset,
+            batch_size=neg_samples_dataset.batch_size,
+            num_workers=args.workers
+        )
 
     # initialize ResNet
     encoder = get_resnet(args.resnet, pretrained=False)
