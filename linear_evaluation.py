@@ -86,6 +86,7 @@ def train(args, loader, model, criterion, optimizer):
 def test(args, loader, model, criterion):
     loss_epoch = 0
     accuracy_epoch = 0
+    accuracy5_epoch = 0
     model.eval()
     for _, (x, y) in enumerate(loader):
         model.zero_grad()
@@ -97,12 +98,16 @@ def test(args, loader, model, criterion):
         loss = criterion(output, y)
 
         predicted = output.argmax(1)
+        predicted_top5 = output.topk(5, 1)[1]
         acc = (predicted == y).sum().item() / y.size(0)
+        acc_5 = sum([1 if y[i] in predicted_top5[i]
+                    else 0 for i in range(len(y))]) / y.size(0)
         accuracy_epoch += acc
+        accuracy5_epoch += acc_5
 
         loss_epoch += loss.item()
 
-    return loss_epoch, accuracy_epoch
+    return loss_epoch, accuracy_epoch, accuracy5_epoch
 
 
 if __name__ == "__main__":
@@ -262,8 +267,17 @@ if __name__ == "__main__":
         print(f"""Epoch [{epoch}/{args.logistic_epochs}]\t """
               f"""Loss: {loss_epoch / len(arr_train_loader)}\t """
               f"""Accuracy: {accuracy_epoch / len(arr_train_loader)}""")
+        if epoch % 100 == 0:
+            loss_epoch, accuracy_epoch, accuracy5_epoch = test(
+                args, arr_test_loader, model, criterion)
+            print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
+                  f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}"""
+                  f"""Accuracy Top 5: {
+                      accuracy5_epoch / len(arr_test_loader)}""")
 
     # final testing
-    loss_epoch, accuracy_epoch = test(args, arr_test_loader, model, criterion)
+    loss_epoch, accuracy_epoch, accuracy5_epoch = test(
+        args, arr_test_loader, model, criterion)
     print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
-          f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}""")
+          f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}\t """
+          f"""Accuracy Top 5: {accuracy5_epoch / len(arr_test_loader)}""")

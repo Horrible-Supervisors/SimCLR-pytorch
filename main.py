@@ -235,8 +235,8 @@ def main(gpu, args):
             writer.add_scalar("Misc/learning_rate", lr, epoch)
             print(
                 f"""Epoch [{epoch}/{args.epochs}]\t Loss: {
-                    loss_epoch / len(train_loader)}\t lr: {round(lr, 5)}\n
-                    Epoch Time: {end - start} seconds"""
+                    loss_epoch / len(train_loader)}\t lr: {
+                        round(lr, 5)}\nEpoch Time: {end - start} seconds"""
             )
             args.current_epoch += 1
 
@@ -265,7 +265,8 @@ if __name__ == "__main__":
             manipulator = DataManipulator(
                 args.dataset_dir + "/imagenet/train.csv",
                 args.dataset_dir + "/imagenet/val.csv",
-                args.n_classes, args.n_img_class)
+                args.n_classes, args.n_img_class,
+                args.dataset_dir + "/imagenet/")
             manipulator.create_csv(args.train_csv, args.val_csv, args.seed)
 
     # Master address for distributed data parallel
