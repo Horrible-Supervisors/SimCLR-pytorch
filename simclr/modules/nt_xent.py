@@ -95,7 +95,8 @@ class NT_Xent_With_Neg_Samples(nn.Module):
         z = torch.cat((z_i, z_j), dim=0)
 
         sim = self.similarity_f(z.unsqueeze(1), z.unsqueeze(0)) / self.temperature
-        neg_sim = self.similarity_f(z.unsqueeze(1), z_neg.unsqueeze(0)) / self.temperature
+        neg_sim_i_j = self.similarity_f(z.unsqueeze(1), z_neg.unsqueeze(0)) / self.temperature
+        neg_sim_j_i = self.similarity_f(z.unsqueeze(0), z_neg.unsqueeze(1)) / self.temperature
 
         sim_i_j = torch.diag(sim, self.batch_size * self.world_size)
         sim_j_i = torch.diag(sim, -self.batch_size * self.world_size)
@@ -108,10 +109,10 @@ class NT_Xent_With_Neg_Samples(nn.Module):
             sim_j_i[:self.batch_size * self.world_size]),
             dim=0).reshape(sample_count, 1)
         # negative_samples = sim[self.mask].reshape(sample_count, -1)
-        negative_samples = torch.cat((sim[self.mask].reshape(sample_count, -1), neg_sim), dim=1)
+        negative_samples = torch.cat((sim[self.mask].reshape(sample_count, -1), neg_sim_i_j, neg_sim_j_i), dim=1)
 
         labels = torch.zeros(sample_count).to(positive_samples.device).long()
         logits = torch.cat((positive_samples, negative_samples), dim=1)
         loss = self.criterion(logits, labels)
-        loss /= (N + neg_sim.shape[1])
+        loss /= (N + neg_sim_i_j.shape[1] + neg_sim_j_i.shape[1])
         return loss

@@ -1,5 +1,5 @@
 import argparse
-import os
+import os, pdb
 import numpy as np
 import torch
 import torchvision
@@ -25,13 +25,15 @@ from utils import yaml_config_hook, data, DataManipulator
 
 
 def train(args, train_loader, model, criterion, optimizer, writer,
-          neg_samples_loader):
+          neg_samples_loader, steps_per_epoch):
 
     if neg_samples_loader is not None:
         iter_obj = iter(neg_samples_loader)
 
     loss_epoch = 0
     for step, ((x_i, x_j), _) in enumerate(train_loader):
+        if step >= steps_per_epoch:
+            break
         # print(f"step: {step}", flush=True)
         ns = None
         if neg_samples_loader is not None:
@@ -58,8 +60,8 @@ def train(args, train_loader, model, criterion, optimizer, writer,
             loss = loss.data.clone()
             dist.all_reduce(loss.div_(dist.get_world_size()))
 
-        if args.nr == 0 and step % 50 == 0:
-            print(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
+        if args.nr == 0 and (step % 5 == 0 or step == steps_per_epoch-1):
+            print(f"Step [{step}/{steps_per_epoch}]\t Loss: {loss.item()}")
 
         if args.nr == 0:
             writer.add_scalar("Loss/train_epoch",
@@ -146,7 +148,10 @@ def main(gpu, args):
     )
 
     train_steps = len(train_dataset) * args.epochs // args.batch_size + 1
-    steps_per_epoch = int(train_steps / 100)
+    steps_per_epoch = int(train_steps / args.epochs)
+    if args.include_neg_samples:
+        train_steps = len(train_dataset) * args.epochs // (args.batch_size + args.ns_batch_size/2) + 1
+        steps_per_epoch = int(train_steps / args.epochs)
 
     neg_samples_loader = None
     if args.include_neg_samples:
@@ -221,7 +226,8 @@ def main(gpu, args):
 
         lr = optimizer.param_groups[0]["lr"]
         loss_epoch = train(args, train_loader, model,
-                           criterion, optimizer, writer, neg_samples_loader)
+                           criterion, optimizer, writer,
+                           neg_samples_loader, steps_per_epoch)
 
         if args.nr == 0 and scheduler:
             scheduler.step()
