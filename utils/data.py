@@ -1,4 +1,4 @@
-import os, time
+import os
 
 import numpy as np
 import pandas as pd
@@ -82,10 +82,9 @@ class NegativeImagenetDataset(Dataset):
     # Obtaining negative image variations for all class labels
     # in Imagenette dataset
 
-    def __init__(self, images_folder, batch_size, n_img_class, 
-                 n_img_samples_per_class, class_remapping_file_path, 
-                 epochs, train_steps,
-                 steps_per_epoch, transform) -> None:
+    def __init__(self, images_folder, batch_size, n_img_class,
+                 n_img_samples_per_class, class_remapping_file_path,
+                 epochs, train_steps, steps_per_epoch, transform):
         # Expectations:
         # Image_folder exists and contains images for all class labels
         # (No assert, but this will crash the program later)
@@ -116,29 +115,38 @@ class NegativeImagenetDataset(Dataset):
             self.num_variations = 1
         # self.randomize_samples()
 
-        self.inverse_class_mappings = self.load_class_mappings(class_remapping_file_path)
+        self.inverse_class_mappings = self.load_class_mappings(
+            class_remapping_file_path)
         self.get_index_array()
 
     def __len__(self):
         return self.size
-    
+
     def load_class_mappings(self, mapping_file_path):
-        if mapping_file_path is None: 
-            return {class_id: class_id for class_id in np.arange(self.max_classes)}
-        
+        if mapping_file_path is None:
+            return {
+                class_id: class_id for class_id in np.arange(self.max_classes)
+            }
+
         class_mappings = pd.read_pickle(mapping_file_path, compression='infer')
-        return {converted_class_id: class_id for class_id, converted_class_id in class_mappings.items() }
+        return {
+            r_class_id: class_id
+            for class_id, r_class_id in class_mappings.items()
+        }
 
     def get_index_array(self):
         class_arr = np.arange(self.max_classes)
         variation_arr = np.arange(self.max_variations)
-        selected_variations = np.random.choice(variation_arr, size=(self.size, self.num_variations)).flatten()
+        selected_variations = np.random.choice(
+            variation_arr, size=(self.size, self.num_variations)).flatten()
         selected_class_list = []
         for i in range(self.steps_per_epoch):
-            selected_classes = np.random.choice(class_arr, size=min(self.max_classes, self.batch_size), replace=False)
+            selected_classes = np.random.choice(class_arr, size=min(
+                self.max_classes, self.batch_size), replace=False)
             selected_class_list.append(selected_classes)
         selected_classes = np.array(selected_class_list).flatten()
-        self.index_arr = np.stack((selected_classes, selected_variations), axis=1)
+        self.index_arr = np.stack(
+            (selected_classes, selected_variations), axis=1)
 
     def randomize_samples(self):
         # Meant to be called before every epoch
@@ -159,8 +167,8 @@ class NegativeImagenetDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        class_index = int(self.inverse_class_mappings[self.index_arr[idx,0]])
-        variation_idx = int(self.index_arr[idx,1])
+        class_index = int(self.inverse_class_mappings[self.index_arr[idx, 0]])
+        variation_idx = int(self.index_arr[idx, 1])
         # class_index = int(self.class_indices[int(idx/self.num_variations)])
         # variation_idx = int(self.variation_indices[idx])
         img_name = os.path.join(self.images_folder,
