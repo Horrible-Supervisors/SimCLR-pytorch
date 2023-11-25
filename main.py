@@ -1,5 +1,5 @@
 import argparse
-import os, pdb
+import os
 import numpy as np
 import torch
 import torchvision
@@ -129,8 +129,8 @@ def main(gpu, args):
         )
     elif args.dataset == "Demon-Imagenet":
         train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/demon/train-r.csv",
-            args.dataset_dir + "/demon/train",
+            args.dataset_dir + "/demon-dataset/train-r.csv",
+            args.dataset_dir + "/demon-dataset/train",
             num_variations=args.num_variations,
             transform_type=args.transform_type,
             transform=TransformsSimCLR(size=args.image_size),
@@ -158,13 +158,16 @@ def main(gpu, args):
     train_steps = len(train_dataset) * args.epochs // args.batch_size + 1
     steps_per_epoch = int(train_steps / args.epochs)
     if args.include_neg_samples:
-        train_steps = len(train_dataset) * args.epochs // (args.batch_size + args.ns_batch_size/2) + 1
+        train_steps = len(
+            train_dataset
+        ) * args.epochs // (args.batch_size + args.ns_batch_size/2) + 1
         steps_per_epoch = int(train_steps / args.epochs)
 
     neg_samples_loader = None
     if args.include_neg_samples:
+
         neg_sample_transform = torchvision.transforms.Compose([
-                    torchvision.transforms.Resize(
+            torchvision.transforms.Resize(
                         size=args.image_size),
                     torchvision.transforms.CenterCrop(
                         size=args.image_size),
@@ -180,11 +183,11 @@ def main(gpu, args):
                 epochs=args.epochs,
                 train_steps=train_steps,
                 steps_per_epoch=steps_per_epoch,
-                transform= neg_sample_transform
+                transform=neg_sample_transform
             )
         elif args.dataset == "Demon-Imagenet":
             neg_samples_dataset = data.NegativeImagenetDataset(
-                images_folder=args.dataset_dir + "/demon/negative_samples/",
+                images_folder=args.dataset_dir + "/demon-dataset/negative_samples/",
                 batch_size=args.ns_batch_size,
                 n_img_class=args.n_img_class,
                 n_img_samples_per_class=args.n_img_samples_per_class,
@@ -275,8 +278,10 @@ def main(gpu, args):
 if __name__ == "__main__":
 
     config_parser = argparse.ArgumentParser(description="Config")
-    config_parser.add_argument('--config', '-c', required=False, default="./config/config.yaml",
-                               help="The config.yaml file to use. Contains the arguments for the training run.")
+    config_parser.add_argument(
+        '--config', '-c', required=False, default="./config/config.yaml",
+        help="""The config.yaml file to use. """
+             """Contains the arguments for the training run.""")
     config_args, _ = config_parser.parse_known_args()
     config_filepath = config_args.config
 
