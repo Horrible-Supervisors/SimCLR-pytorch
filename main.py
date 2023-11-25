@@ -60,7 +60,7 @@ def train(args, train_loader, model, criterion, optimizer, writer,
             loss = loss.data.clone()
             dist.all_reduce(loss.div_(dist.get_world_size()))
 
-        if args.nr == 0 and (step % 5 == 0 or step == steps_per_epoch-1):
+        if args.nr == 0 and (step % 50 == 0 or step == steps_per_epoch-1):
             print(f"Step [{step}/{steps_per_epoch}]\t Loss: {loss.item()}")
 
         if args.nr == 0:
@@ -250,7 +250,7 @@ def main(gpu, args):
             print(
                 f"""Epoch [{epoch}/{args.epochs}]\t Loss: {
                     loss_epoch / len(train_loader)}\t lr: {
-                        round(lr, 5)}\nEpoch Time: {end - start} seconds"""
+                        round(lr, 5)}\nEpoch Time: {end - start:.2f} sec"""
             )
             args.current_epoch += 1
 
