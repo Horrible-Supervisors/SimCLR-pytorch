@@ -60,7 +60,7 @@ def train(args, train_loader, model, criterion, optimizer, writer,
             loss = loss.data.clone()
             dist.all_reduce(loss.div_(dist.get_world_size()))
 
-        if args.nr == 0 and (step % 5 == 0 or step == steps_per_epoch-1):
+        if args.nr == 0 and (step % 50 == 0 or step == steps_per_epoch-1):
             print(f"Step [{step}/{steps_per_epoch}]\t Loss: {loss.item()}")
 
         if args.nr == 0:
@@ -123,6 +123,14 @@ def main(gpu, args):
         train_dataset = data.ImagenetDataset(
             args.train_csv,
             args.dataset_dir + "/imagenet/train",
+            num_variations=args.num_variations,
+            transform_type=args.transform_type,
+            transform=TransformsSimCLR(size=args.image_size),
+        )
+    elif args.dataset == "Demon-Imagenet":
+        train_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/demon/train-r.csv",
+            args.dataset_dir + "/demon/train",
             num_variations=args.num_variations,
             transform_type=args.transform_type,
             transform=TransformsSimCLR(size=args.image_size),
@@ -242,7 +250,7 @@ def main(gpu, args):
             print(
                 f"""Epoch [{epoch}/{args.epochs}]\t Loss: {
                     loss_epoch / len(train_loader)}\t lr: {
-                        round(lr, 5)}\nEpoch Time: {end - start} seconds"""
+                        round(lr, 5)}\nEpoch Time: {end - start:.2f} sec"""
             )
             args.current_epoch += 1
 
@@ -264,6 +272,13 @@ if __name__ == "__main__":
         parser.add_argument(f"--{k}", default=v, type=type(v))
 
     args, _ = parser.parse_known_args()
+
+    print("Dataset: ", args.dataset)
+    print("Transform type: ", args.transform_type)
+    print("Batch size: ", args.batch_size)
+    print("Number of epochs: ", args.epochs)
+    print("ResNet: ", args.resnet)
+    print("Model Path: ", args.model_path)
 
     t_start = time.time()
 
