@@ -214,7 +214,7 @@ if __name__ == "__main__":
         )
     elif args.dataset == "Demon-Imagenet":
         train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/demon/train.csv",
+            args.dataset_dir + "/demon/train-r.csv",
             args.dataset_dir + "/demon/train",
             num_variations=0,
             transform_type=4,
