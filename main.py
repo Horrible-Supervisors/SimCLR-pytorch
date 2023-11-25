@@ -267,6 +267,13 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    print("Dataset: ", args.dataset)
+    print("Transform type: ", args.transform_type)
+    print("Batch size: ", args.batch_size)
+    print("Number of epochs: ", args.epochs)
+    print("ResNet: ", args.resnet)
+    print("Model Path: ", args.model_path)
+
     t_start = time.time()
 
     if args.dataset == "HS-Imagenet":
