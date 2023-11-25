@@ -129,7 +129,7 @@ def main(gpu, args):
         )
     elif args.dataset == "Demon-Imagenet":
         train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/demon/train.csv",
+            args.dataset_dir + "/demon/train-r.csv",
             args.dataset_dir + "/demon/train",
             num_variations=args.num_variations,
             transform_type=args.transform_type,
