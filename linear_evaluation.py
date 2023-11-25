@@ -221,14 +221,14 @@ if __name__ == "__main__":
         )
     elif args.dataset == "Demon-Imagenet":
         train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/demon/train-r.csv",
-            args.dataset_dir + "/demon/train",
+            args.dataset_dir + "/demon-dataset/train-r.csv",
+            args.dataset_dir + "/demon-dataset/train",
             num_variations=0,
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
         test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenet/val-50-1000-r.csv",
+            args.dataset_dir + "/demon-dataset/val-r.csv",
             args.dataset_dir + "/imagenet/val",
             num_variations=0,
             transform_type=4,
