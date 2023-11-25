@@ -127,6 +127,14 @@ def main(gpu, args):
             transform_type=args.transform_type,
             transform=TransformsSimCLR(size=args.image_size),
         )
+    elif args.dataset == "Demon-Imagenet":
+        train_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/demon/train.csv",
+            args.dataset_dir + "/demon/train",
+            num_variations=args.num_variations,
+            transform_type=args.transform_type,
+            transform=TransformsSimCLR(size=args.image_size),
+        )
     else:
         raise NotImplementedError
 

@@ -212,6 +212,21 @@ if __name__ == "__main__":
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
+    elif args.dataset == "Demon-Imagenet":
+        train_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/demon/train.csv",
+            args.dataset_dir + "/demon/train",
+            num_variations=0,
+            transform_type=4,
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
+        test_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/imagenet/val-50-1000-r.csv",
+            args.dataset_dir + "/imagenet/val",
+            num_variations=0,
+            transform_type=4,
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
     else:
         raise NotImplementedError
 
@@ -267,11 +282,11 @@ if __name__ == "__main__":
         print(f"""Epoch [{epoch}/{args.logistic_epochs}]\t """
               f"""Loss: {loss_epoch / len(arr_train_loader)}\t """
               f"""Accuracy: {accuracy_epoch / len(arr_train_loader)}""")
-        if epoch % 100 == 0:
+        if epoch % 50 == 0:
             loss_epoch, accuracy_epoch, accuracy5_epoch = test(
                 args, arr_test_loader, model, criterion)
             print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
-                  f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}"""
+                  f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}\t """
                   f"""Accuracy Top 5: {
                       accuracy5_epoch / len(arr_test_loader)}""")
 
