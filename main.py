@@ -163,22 +163,36 @@ def main(gpu, args):
 
     neg_samples_loader = None
     if args.include_neg_samples:
-        if args.dataset == "Imagenette":
-            neg_samples_dataset = data.NegativeImagenetteDataset(
-                images_folder=args.dataset_dir + "/imagenette/negative_samples/",
-                batch_size=args.ns_batch_size,
-                n_img_class=args.n_img_class,
-                n_img_samples_per_class=args.n_img_samples_per_class,
-                epochs=args.epochs,
-                train_steps=train_steps,
-                steps_per_epoch=steps_per_epoch,
-                transform=torchvision.transforms.Compose([
+        neg_sample_transform = torchvision.transforms.Compose([
                     torchvision.transforms.Resize(
                         size=args.image_size),
                     torchvision.transforms.CenterCrop(
                         size=args.image_size),
                     torchvision.transforms.ToTensor(),
                 ])
+        if args.dataset == "Imagenette":
+            neg_samples_dataset = data.NegativeImagenetDataset(
+                images_folder=args.dataset_dir + "/imagenette/negative_samples/",
+                batch_size=args.ns_batch_size,
+                n_img_class=args.n_img_class,
+                n_img_samples_per_class=args.n_img_samples_per_class,
+                class_remapping_file_path=None,
+                epochs=args.epochs,
+                train_steps=train_steps,
+                steps_per_epoch=steps_per_epoch,
+                transform= neg_sample_transform
+            )
+        elif args.dataset == "Demon-Imagenet":
+            neg_samples_dataset = data.NegativeImagenetDataset(
+                images_folder=args.dataset_dir + "/demon/negative_samples/",
+                batch_size=args.ns_batch_size,
+                n_img_class=args.n_img_class,
+                n_img_samples_per_class=args.n_img_samples_per_class,
+                class_remapping_file_path="./remappings/remapping-demon.pkl",
+                epochs=args.epochs,
+                train_steps=train_steps,
+                steps_per_epoch=steps_per_epoch,
+                transform= neg_sample_transform
             )
         neg_samples_loader = torch.utils.data.DataLoader(
             neg_samples_dataset,

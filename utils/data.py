@@ -6,9 +6,6 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 
-COUNT_IMAGENETTE_CLASSES = 10
-COUNT_MAX_NEG_SAMPLE_VARIATIONS = 10
-
 
 class ImagenetDataset(Dataset):
     """Imagenet dataset."""
@@ -80,13 +77,14 @@ class ImagenetDataset(Dataset):
         return image, label
 
 
-class NegativeImagenetteDataset(Dataset):
+class NegativeImagenetDataset(Dataset):
     # Purpose of class:
     # Obtaining negative image variations for all class labels
     # in Imagenette dataset
 
     def __init__(self, images_folder, batch_size, n_img_class, 
-                 n_img_samples_per_class, epochs, train_steps, 
+                 n_img_samples_per_class, class_remapping_file_path, 
+                 epochs, train_steps,
                  steps_per_epoch, transform) -> None:
         # Expectations:
         # Image_folder exists and contains images for all class labels
@@ -104,7 +102,6 @@ class NegativeImagenetteDataset(Dataset):
         self.batch_size = batch_size
         self.transform = transform
 
-        # self.size = self.batch_size * self.train_steps
         self.size = self.batch_size * self.steps_per_epoch
         self.index_list = []
 
@@ -118,11 +115,20 @@ class NegativeImagenetteDataset(Dataset):
         if self.num_variations == 0:
             self.num_variations = 1
         # self.randomize_samples()
+
+        self.inverse_class_mappings = self.load_class_mappings(class_remapping_file_path)
         self.get_index_array()
 
     def __len__(self):
         return self.size
     
+    def load_class_mappings(self, mapping_file_path):
+        if mapping_file_path is None: 
+            return {class_id: class_id for class_id in np.arange(self.max_classes)}
+        
+        class_mappings = pd.read_pickle(mapping_file_path, compression='infer')
+        return {converted_class_id: class_id for class_id, converted_class_id in class_mappings.items() }
+
     def get_index_array(self):
         class_arr = np.arange(self.max_classes)
         variation_arr = np.arange(self.max_variations)
@@ -153,7 +159,7 @@ class NegativeImagenetteDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        class_index = int(self.index_arr[idx,0])
+        class_index = int(self.inverse_class_mappings[self.index_arr[idx,0]])
         variation_idx = int(self.index_arr[idx,1])
         # class_index = int(self.class_indices[int(idx/self.num_variations)])
         # variation_idx = int(self.variation_indices[idx])
