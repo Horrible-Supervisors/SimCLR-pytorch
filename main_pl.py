@@ -74,13 +74,19 @@ class ContrastiveLearning(LightningModule):
 
 if __name__ == "__main__":
 
+    config_parser = argparse.ArgumentParser(description="Config")
+    config_parser.add_argument('--config', '-c', required=False, default="./config/config.yaml",
+                               help="The config.yaml file to use. Contains the arguments for the training run.")
+    config_args, _ = config_parser.parse_known_args()
+    config_filepath = config_args.config
+
     parser = argparse.ArgumentParser(description="SimCLR")
 
-    config = yaml_config_hook("./config/config.yaml")
+    config = yaml_config_hook(config_filepath)
     for k, v in config.items():
         parser.add_argument(f"--{k}", default=v, type=type(v))
 
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
 
     if args.dataset == "STL10":
         train_dataset = torchvision.datasets.STL10(
