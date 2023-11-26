@@ -183,7 +183,7 @@ def main(gpu, args):
         ])
         if args.dataset == "Imagenette":
             neg_samples_dataset = data.NegativeImagenetDataset(
-                images_folder=args.dataset_dir+"/imagenette/negative_samples/",
+                images_folder=args.dataset_dir + "/negative_samples/",
                 batch_size=args.ns_batch_size,
                 n_classes=args.n_classes,
                 n_img_samples_per_class=args.n_img_samples_per_class,
@@ -195,7 +195,7 @@ def main(gpu, args):
             )
         elif args.dataset == "Demon-Imagenet":
             neg_samples_dataset = data.NegativeImagenetDataset(
-                images_folder=args.dataset_dir+"/negative_samples/",
+                images_folder=args.dataset_dir + "/negative_samples/",
                 batch_size=args.ns_batch_size,
                 n_classes=args.n_classes,
                 n_img_samples_per_class=args.n_img_samples_per_class,
