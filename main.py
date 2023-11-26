@@ -205,6 +205,18 @@ def main(gpu, args):
                 steps_per_epoch=steps_per_epoch,
                 transform=neg_sample_transform
             )
+        elif args.dataset == "Almighty-Imagenet":
+            neg_samples_dataset = data.NegativeImagenetDataset(
+                images_folder=args.dataset_dir + "/negative_samples/",
+                batch_size=args.ns_batch_size,
+                n_classes=args.n_classes,
+                n_img_samples_per_class=args.n_img_samples_per_class,
+                class_remapping_file_path="./remappings/remapping-almighty.pkl",
+                epochs=args.epochs,
+                train_steps=train_steps,
+                steps_per_epoch=steps_per_epoch,
+                transform=neg_sample_transform
+            )
         neg_samples_loader = torch.utils.data.DataLoader(
             neg_samples_dataset,
             batch_size=neg_samples_dataset.batch_size,
