@@ -109,10 +109,10 @@ class NT_Xent_With_Neg_Samples(nn.Module):
             sim_j_i[:self.batch_size * self.world_size]),
             dim=0).reshape(sample_count, 1)
         # negative_samples = sim[self.mask].reshape(sample_count, -1)
-        negative_samples = torch.cat((sim[self.mask].reshape(sample_count, -1), neg_sim_i_j, neg_sim_j_i), dim=1)
+        negative_samples = torch.cat((sim[self.mask].reshape(sample_count, -1), neg_sim_i_j, neg_sim_j_i.reshape(sample_count, -1)), dim=1)
 
         labels = torch.zeros(sample_count).to(positive_samples.device).long()
         logits = torch.cat((positive_samples, negative_samples), dim=1)
         loss = self.criterion(logits, labels)
-        loss /= (N + neg_sim_i_j.shape[1] + neg_sim_j_i.shape[1])
+        loss /= (N + neg_sim_i_j.shape[1] + neg_sim_j_i.shape[0])
         return loss
