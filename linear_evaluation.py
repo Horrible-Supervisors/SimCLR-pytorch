@@ -236,6 +236,21 @@ if __name__ == "__main__":
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
         )
+    elif args.dataset == "Almighty-Imagenet":
+        train_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/almighty-dataset/train-r.csv",
+            args.dataset_dir + "/almighty-dataset/train",
+            num_variations=0,
+            transform_type=4,
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
+        test_dataset = data.ImagenetDataset(
+            args.dataset_dir + "/almighty-dataset/val-r.csv",
+            args.dataset_dir + "/imagenet/val",
+            num_variations=0,
+            transform_type=4,
+            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        )
     else:
         raise NotImplementedError
 

@@ -17,7 +17,7 @@ num_variations: 10
 transform_type: 0 # 0: SimCLR, 1: ImageVariation, 2: SimCLR or ImageVariation (randomly chosen) 3: ImageVariation + SimCLR
 start_epoch: 0
 epochs: 100
-dataset: "Demon-Imagenet" # "HS-Imagenet" or "Imagenet-1pct" or "Imagenet-10pct" or "Imagenette" or "Demon-Imagenet"
+dataset: "Demon-Imagenet" # "HS-Imagenet" or "Imagenet-1pct" or "Imagenet-10pct" or "Imagenette" or "Demon-Imagenet" or "Almighty-Imagenet"
 pretrain: True
 include_neg_samples: False
 ns_batch_size: 512 # number of negative samples per batch
