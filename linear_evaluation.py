@@ -113,8 +113,10 @@ def test(args, loader, model, criterion):
 if __name__ == "__main__":
 
     config_parser = argparse.ArgumentParser(description="Config")
-    config_parser.add_argument('--config', '-c', required=False, default="./config/config.yaml",
-                               help="The config.yaml file to use. Contains the arguments for the training run.")
+    config_parser.add_argument(
+        '--config', '-c', required=False, default="./config/config.yaml",
+        help="""The config.yaml file to use. """
+             """Contains the arguments for the training run.""")
     config_args, _ = config_parser.parse_known_args()
     config_filepath = config_args.config
 
