@@ -320,3 +320,12 @@ if __name__ == "__main__":
     print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
           f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}\t """
           f"""Accuracy Top 5: {accuracy5_epoch / len(arr_test_loader)}""")
+
+    print("Dataset: ", args.dataset)
+    print("Transform type: ", args.transform_type)
+    print("Batch size: ", args.batch_size)
+    print("Number of epochs: ", args.epochs)
+    print("ResNet: ", args.resnet)
+    print("Model Path: ", args.model_path)
+    print("Include negative samples: ", args.include_neg_samples)
+    print("Number of negative samples: ", args.n_img_samples_per_class)

@@ -306,6 +306,8 @@ if __name__ == "__main__":
     print("Number of epochs: ", args.epochs)
     print("ResNet: ", args.resnet)
     print("Model Path: ", args.model_path)
+    print("Include negative samples: ", args.include_neg_samples)
+    print("Number of negative samples: ", args.n_img_samples_per_class)
 
     t_start = time.time()
 
@@ -345,4 +347,14 @@ if __name__ == "__main__":
         main(0, args)
 
     t_end = time.time()
+
+    print("Dataset: ", args.dataset)
+    print("Transform type: ", args.transform_type)
+    print("Batch size: ", args.batch_size)
+    print("Number of epochs: ", args.epochs)
+    print("ResNet: ", args.resnet)
+    print("Model Path: ", args.model_path)
+    print("Include negative samples: ", args.include_neg_samples)
+    print("Number of negative samples: ", args.n_img_samples_per_class)
+
     print(f"Total time: {t_end - t_start} seconds")
