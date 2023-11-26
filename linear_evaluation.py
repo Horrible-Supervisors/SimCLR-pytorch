@@ -324,7 +324,7 @@ if __name__ == "__main__":
     print("Dataset: ", args.dataset)
     print("Transform type: ", args.transform_type)
     print("Batch size: ", args.batch_size)
-    print("Number of epochs: ", args.epochs)
+    print("Number of epochs: ", args.epoch_num)
     print("ResNet: ", args.resnet)
     print("Model Path: ", args.model_path)
     print("Include negative samples: ", args.include_neg_samples)
