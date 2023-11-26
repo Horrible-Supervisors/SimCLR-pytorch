@@ -260,7 +260,7 @@ def main(gpu, args):
 
     writer = None
     if args.nr == 0:
-        writer = SummaryWriter()
+        writer = SummaryWriter(log_dir=args.model_path)
 
     args.global_step = 0
     args.current_epoch = args.start_epoch
