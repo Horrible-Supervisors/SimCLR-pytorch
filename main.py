@@ -165,7 +165,7 @@ def main(gpu, args):
 
     train_steps = len(train_dataset) * args.epochs // args.batch_size + 1
     steps_per_epoch = int(train_steps / args.epochs)
-    if args.include_neg_samples:
+    if args.include_neg_samples and args.neg_train_steps:
         train_steps = len(
             train_dataset
         ) * args.epochs // (args.batch_size + args.ns_batch_size/2) + 1

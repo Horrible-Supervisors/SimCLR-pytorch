@@ -136,12 +136,16 @@ class NegativeImagenetDataset(Dataset):
     def get_index_array(self):
         class_arr = np.arange(self.max_classes)
         variation_arr = np.arange(self.max_variations)
-
         selected_variations = np.random.choice(variation_arr, size=self.size)
-        selected_classes = np.random.choice(class_arr, size=self.size)
-
-
-
+        if self.max_classes < self.batch_size:
+            selected_classes = np.tile(np.arange(self.max_classes), int(np.ceil(self.size/self.max_classes)))
+            selected_classes = selected_classes[:self.size]
+        else:
+            selected_class_list = []
+            for i in range(self.steps_per_epoch):
+                selected_classes = np.random.choice(class_arr, size=self.batch_size, replace=False)
+                selected_class_list.append(selected_classes)
+            selected_classes = np.array(selected_class_list).flatten()
         self.index_arr = np.stack((selected_classes, selected_variations), axis=1)
 
     def randomize_samples(self):

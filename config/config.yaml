@@ -20,6 +20,7 @@ epochs: 100
 dataset: "Demon-Imagenet" # "HS-Imagenet" or "Imagenet-1pct" or "Imagenet-10pct" or "Imagenette" or "Demon-Imagenet" or "Almighty-Imagenet"
 pretrain: True
 include_neg_samples: False
+neg_train_steps: True
 ns_batch_size: 512 # number of negative samples per batch
 
 # model options
