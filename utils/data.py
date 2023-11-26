@@ -82,7 +82,7 @@ class NegativeImagenetDataset(Dataset):
     # Obtaining negative image variations for all class labels
     # in Imagenette dataset
 
-    def __init__(self, images_folder, batch_size, n_img_class,
+    def __init__(self, images_folder, batch_size, n_classes,
                  n_img_samples_per_class, class_remapping_file_path,
                  epochs, train_steps, steps_per_epoch, transform):
         # Expectations:
@@ -91,7 +91,7 @@ class NegativeImagenetDataset(Dataset):
         # Batch size is less than or equal to the number of
         # available image files (Enforced by assert)
         super().__init__()
-        self.max_classes = n_img_class
+        self.max_classes = n_classes
         self.max_variations = n_img_samples_per_class
         self.epochs = epochs
         self.train_steps = train_steps
@@ -136,8 +136,12 @@ class NegativeImagenetDataset(Dataset):
     def get_index_array(self):
         class_arr = np.arange(self.max_classes)
         variation_arr = np.arange(self.max_variations)
+
         selected_variations = np.random.choice(variation_arr, size=self.size)
         selected_classes = np.random.choice(class_arr, size=self.size)
+
+
+
         self.index_arr = np.stack((selected_classes, selected_variations), axis=1)
 
     def randomize_samples(self):

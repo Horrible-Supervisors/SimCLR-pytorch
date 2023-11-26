@@ -185,7 +185,7 @@ def main(gpu, args):
             neg_samples_dataset = data.NegativeImagenetDataset(
                 images_folder=args.dataset_dir+"/imagenette/negative_samples/",
                 batch_size=args.ns_batch_size,
-                n_img_class=args.n_img_class,
+                n_classes=args.n_classes,
                 n_img_samples_per_class=args.n_img_samples_per_class,
                 class_remapping_file_path=None,
                 epochs=args.epochs,
@@ -197,7 +197,7 @@ def main(gpu, args):
             neg_samples_dataset = data.NegativeImagenetDataset(
                 images_folder=args.dataset_dir+"/negative_samples/",
                 batch_size=args.ns_batch_size,
-                n_img_class=args.n_img_class,
+                n_classes=args.n_classes,
                 n_img_samples_per_class=args.n_img_samples_per_class,
                 class_remapping_file_path="./remappings/remapping-demon.pkl",
                 epochs=args.epochs,
