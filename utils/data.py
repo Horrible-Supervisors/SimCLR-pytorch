@@ -113,7 +113,6 @@ class NegativeImagenetDataset(Dataset):
         self.num_variations = int(self.batch_size/self.max_classes)
         if self.num_variations == 0:
             self.num_variations = 1
-        # self.randomize_samples()
 
         self.inverse_class_mappings = self.load_class_mappings(
             class_remapping_file_path)
@@ -137,16 +136,9 @@ class NegativeImagenetDataset(Dataset):
     def get_index_array(self):
         class_arr = np.arange(self.max_classes)
         variation_arr = np.arange(self.max_variations)
-        selected_variations = np.random.choice(
-            variation_arr, size=(self.size, self.num_variations)).flatten()
-        selected_class_list = []
-        for i in range(self.steps_per_epoch):
-            selected_classes = np.random.choice(class_arr, size=min(
-                self.max_classes, self.batch_size), replace=False)
-            selected_class_list.append(selected_classes)
-        selected_classes = np.array(selected_class_list).flatten()
-        self.index_arr = np.stack(
-            (selected_classes, selected_variations), axis=1)
+        selected_variations = np.random.choice(variation_arr, size=self.size)
+        selected_classes = np.random.choice(class_arr, size=self.size)
+        self.index_arr = np.stack((selected_classes, selected_variations), axis=1)
 
     def randomize_samples(self):
         # Meant to be called before every epoch
