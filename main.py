@@ -168,14 +168,14 @@ def main(gpu, args):
 
         neg_sample_transform = torchvision.transforms.Compose([
             torchvision.transforms.Resize(
-                        size=args.image_size),
-                    torchvision.transforms.CenterCrop(
-                        size=args.image_size),
-                    torchvision.transforms.ToTensor(),
-                ])
+                size=args.image_size),
+            torchvision.transforms.CenterCrop(
+                size=args.image_size),
+            torchvision.transforms.ToTensor(),
+        ])
         if args.dataset == "Imagenette":
             neg_samples_dataset = data.NegativeImagenetDataset(
-                images_folder=args.dataset_dir + "/imagenette/negative_samples/",
+                images_folder=args.dataset_dir+"/imagenette/negative_samples/",
                 batch_size=args.ns_batch_size,
                 n_img_class=args.n_img_class,
                 n_img_samples_per_class=args.n_img_samples_per_class,
@@ -187,7 +187,7 @@ def main(gpu, args):
             )
         elif args.dataset == "Demon-Imagenet":
             neg_samples_dataset = data.NegativeImagenetDataset(
-                images_folder=args.dataset_dir + "/demon-dataset/negative_samples/",
+                images_folder=args.dataset_dir+"/negative_samples/",
                 batch_size=args.ns_batch_size,
                 n_img_class=args.n_img_class,
                 n_img_samples_per_class=args.n_img_samples_per_class,
@@ -195,7 +195,7 @@ def main(gpu, args):
                 epochs=args.epochs,
                 train_steps=train_steps,
                 steps_per_epoch=steps_per_epoch,
-                transform= neg_sample_transform
+                transform=neg_sample_transform
             )
         neg_samples_loader = torch.utils.data.DataLoader(
             neg_samples_dataset,
