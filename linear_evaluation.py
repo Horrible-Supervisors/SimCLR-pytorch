@@ -8,7 +8,7 @@ from simclr import SimCLR
 from simclr.modules import LogisticRegression, get_resnet
 from simclr.modules.transformations import TransformsSimCLR
 
-from utils import yaml_config_hook, data
+from utils import yaml_config_hook, data, visualizations
 
 
 def inference(loader, simclr_model, device):
@@ -88,7 +88,12 @@ def test(args, loader, model, criterion):
     accuracy_epoch = 0
     accuracy5_epoch = 0
     model.eval()
+
+    actual_class_ids = []
+    predicted_class_ids = []
+
     for _, (x, y) in enumerate(loader):
+        actual_class_ids = actual_class_ids + y.tolist()
         model.zero_grad()
 
         x = x.to(args.device)
@@ -98,6 +103,8 @@ def test(args, loader, model, criterion):
         loss = criterion(output, y)
 
         predicted = output.argmax(1)
+        predicted_class_ids = predicted_class_ids + predicted.tolist()
+
         predicted_top5 = output.topk(5, 1)[1]
         acc = (predicted == y).sum().item() / y.size(0)
         acc_5 = sum([1 if y[i] in predicted_top5[i]
@@ -107,7 +114,7 @@ def test(args, loader, model, criterion):
 
         loss_epoch += loss.item()
 
-    return loss_epoch, accuracy_epoch, accuracy5_epoch
+    return loss_epoch, accuracy_epoch, accuracy5_epoch, actual_class_ids, predicted_class_ids
 
 
 if __name__ == "__main__":
@@ -231,7 +238,7 @@ if __name__ == "__main__":
         )
         test_dataset = data.ImagenetDataset(
             args.dataset_dir + "/demon-dataset/val-r.csv",
-            args.dataset_dir + "/imagenet/val",
+            args.dataset_dir + "/demon-dataset/val",
             num_variations=0,
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
@@ -307,7 +314,7 @@ if __name__ == "__main__":
               f"""Loss: {loss_epoch / len(arr_train_loader)}\t """
               f"""Accuracy: {accuracy_epoch / len(arr_train_loader)}""")
         if epoch % 50 == 0:
-            loss_epoch, accuracy_epoch, accuracy5_epoch = test(
+            loss_epoch, accuracy_epoch, accuracy5_epoch, _, _ = test(
                 args, arr_test_loader, model, criterion)
             print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
                   f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}\t """
@@ -315,7 +322,7 @@ if __name__ == "__main__":
                       accuracy5_epoch / len(arr_test_loader)}""")
 
     # final testing
-    loss_epoch, accuracy_epoch, accuracy5_epoch = test(
+    loss_epoch, accuracy_epoch, accuracy5_epoch, actual_class_ids, predicted_class_ids = test(
         args, arr_test_loader, model, criterion)
     print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
           f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}\t """
@@ -329,3 +336,12 @@ if __name__ == "__main__":
     print("Model Path: ", args.model_path)
     print("Include negative samples: ", args.include_neg_samples)
     print("Number of negative samples: ", args.n_img_samples_per_class)
+
+    visualizations.plot_confusion_matrix(actual_class_ids, predicted_class_ids, 'Actual Class Ids', 'Predicted Class Ids', 
+                                         'CF_Grid_' + args.model_path + '_' + str(args.transform_type) + '_' + str(args.include_neg_samples) + '.png',
+                                         args.model_path + '_' + str(args.transform_type) + '_' + str(args.include_neg_samples),
+                                         show_grid=True, unique_id_count=50)
+    visualizations.plot_confusion_matrix(actual_class_ids, predicted_class_ids, 'Actual Class Ids', 'Predicted Class Ids', 
+                                         'CF_' + args.model_path + '_' + str(args.transform_type) + '_' + str(args.include_neg_samples) + '.png',
+                                         args.model_path + '_' + str(args.transform_type) + '_' + str(args.include_neg_samples), 
+                                         show_grid=False, unique_id_count=50)
