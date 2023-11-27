@@ -150,14 +150,24 @@ if __name__ == "__main__":
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if config_args.use_pets:
-        train_dataset = data.PetsDataset(
-            args.dataset_dir+'/pets', train=True, dogs=config_args.use_dogs,
-            transform=TransformsSimCLR(args.image_size).test_transform
-        )
-        test_dataset = data.PetsDataset(
-            args.dataset_dir+'/pets', train=False, dogs=config_args.use_dogs,
-            transform=TransformsSimCLR(args.image_size).test_transform
-        )
+        if config_args.use_dogs:
+            train_dataset = data.PetsDataset(
+                args.dataset_dir+'/pets', train=True, dogs=True,
+                transform=TransformsSimCLR(args.image_size).test_transform
+            )
+            test_dataset = data.PetsDataset(
+                args.dataset_dir+'/pets', train=False, dogs=True,
+                transform=TransformsSimCLR(args.image_size).test_transform
+            )
+        else:
+            train_dataset = data.PetsDataset(
+                args.dataset_dir+'/pets', train=True, dogs=False,
+                transform=TransformsSimCLR(args.image_size).test_transform
+            )
+            test_dataset = data.PetsDataset(
+                args.dataset_dir+'/pets', train=False, dogs=False,
+                transform=TransformsSimCLR(args.image_size).test_transform
+            )
     else:
         if args.dataset == "STL10":
             train_dataset = torchvision.datasets.STL10(
