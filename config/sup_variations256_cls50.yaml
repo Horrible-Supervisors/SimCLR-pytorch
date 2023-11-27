@@ -15,7 +15,7 @@ n_classes: 50
 n_img_class: 1000
 n_img_samples_per_class: 210 # Number of negative images generated per class.
 num_variations: 10
-transform_type: 4 # 0: SimCLR, 1: ImageVariation, 2: SimCLR or ImageVariation (randomly chosen) 3: ImageVariation + SimCLR
+transform_type: 5 # 0: SimCLR, 1: ImageVariation, 2: SimCLR or ImageVariation (randomly chosen) 3: ImageVariation + SimCLR
 start_epoch: 0
 epochs: 100
 dataset: "Demon-Imagenet" # "HS-Imagenet" or "Imagenet-1pct" or "Imagenet-10pct" or "Imagenette" 
@@ -34,7 +34,7 @@ weight_decay: 1.0e-6 # "optimized using LARS [...] and weight decay of 10−6"
 temperature: 0.5 # see appendix B.7.: Optimal temperature under different batch sizes
 
 # reload options
-model_path: "supervised_baseline_checkpoints/demon-transform4-256-cls50-imgcls1000" # set to the directory containing `checkpoint_##.tar`
+model_path: "supervised_baseline_checkpoints/demon-transform5-256-cls50-imgcls1000" # set to the directory containing `checkpoint_##.tar`
 epoch_num: 100 # set to checkpoint number
 reload: False
 

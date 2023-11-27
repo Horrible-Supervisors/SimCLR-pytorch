@@ -213,13 +213,22 @@ def main(gpu, args):
             transform=TransformsSimCLR(size=args.image_size).train_transform,
         )
     elif args.dataset == "Demon-Imagenet":
-        train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/demon-dataset/train-r.csv",
-            args.dataset_dir + "/demon-dataset/train",
-            num_variations=args.num_variations,
-            transform_type=args.transform_type,
-            transform=TransformsSimCLR(size=args.image_size).train_transform,
-        )
+        if args.transform_type == 5:
+            train_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/demon-dataset/train-r.csv",
+                args.dataset_dir + "/demon-dataset/train",
+                num_variations=args.num_variations,
+                transform_type=args.transform_type,
+                transform=TransformsSimCLR(size=args.image_size).variation_transform,
+            )
+        else:
+            train_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/demon-dataset/train-r.csv",
+                args.dataset_dir + "/demon-dataset/train",
+                num_variations=args.num_variations,
+                transform_type=args.transform_type,
+                transform=TransformsSimCLR(size=args.image_size).train_transform,
+            )
         val_dataset = data.ImagenetDataset(
             args.dataset_dir + "/demon-dataset/val-r.csv",
             args.dataset_dir + "/demon-dataset/val",

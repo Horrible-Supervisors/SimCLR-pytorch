@@ -71,6 +71,13 @@ class ImagenetDataset(Dataset):
                                      str(self.image_frame.iloc[idx, 2+a]))
             var1 = Image.open(var1_name)
             image = self.transform((image, var1, 0, 3))
+        elif self.transform_type == 5:
+            a = np.random.choice(self.num_variations, 1, replace=False)
+            a = a[0]
+            var1_name = os.path.join(self.root_dir,
+                                     str(self.image_frame.iloc[idx, 2+a]))
+            var1 = Image.open(var1_name)
+            image = self.transform(var1)
         else:
             image = self.transform(image)
 
