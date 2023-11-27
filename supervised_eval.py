@@ -110,7 +110,7 @@ def main(gpu, args):
     elif args.dataset == "Demon-Imagenet":
         val_dataset = data.ImagenetDataset(
             args.dataset_dir + "/demon-dataset/val-r.csv",
-            args.dataset_dir + "/demon-dataset/val",
+            args.dataset_dir + "/imagenet/val",
             num_variations=0,
             transform_type=4,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
@@ -118,7 +118,7 @@ def main(gpu, args):
     elif args.dataset == "Almighty-Imagenet":
         val_dataset = data.ImagenetDataset(
             args.dataset_dir + "/almighty-dataset/val-r.csv",
-            args.dataset_dir + "/almighty-dataset/val",
+            args.dataset_dir + "/imagenet/val",
             num_variations=args.num_variations,
             transform_type=args.transform_type,
             transform=TransformsSimCLR(size=args.image_size).test_transform,
