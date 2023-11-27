@@ -100,21 +100,21 @@ class PetsDataset(Dataset):
         self.train = train
         self.dogs = dogs
         if self.train:
-            self.root_dir = os.path.join(self.root_dir, 'train')
             if self.dogs:
                 self.image_frame = pd.read_csv(
                     os.path.join(self.root_dir, 'train-dogs.csv'))
             else:
                 self.image_frame = pd.read_csv(
                     os.path.join(self.root_dir, 'train.csv'))
+            self.root_dir = os.path.join(self.root_dir, 'train')
         else:
-            self.root_dir = os.path.join(self.root_dir, 'val')
             if self.dogs:
                 self.image_frame = pd.read_csv(
                     os.path.join(self.root_dir, 'val-dogs.csv'))
             else:
                 self.image_frame = pd.read_csv(
                     os.path.join(self.root_dir, 'val.csv'))
+            self.root_dir = os.path.join(self.root_dir, 'val')
 
     def __len__(self):
         if self.train:
