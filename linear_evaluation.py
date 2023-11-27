@@ -153,20 +153,20 @@ if __name__ == "__main__":
         if config_args.use_dogs:
             train_dataset = data.PetsDataset(
                 args.dataset_dir+'/pets', train=True, dogs=True,
-                transform=TransformsSimCLR(args.image_size).test_transform
+                transform=TransformsSimCLR(size=args.image_size).test_transform
             )
             test_dataset = data.PetsDataset(
                 args.dataset_dir+'/pets', train=False, dogs=True,
-                transform=TransformsSimCLR(args.image_size).test_transform
+                transform=TransformsSimCLR(size=args.image_size).test_transform
             )
         else:
             train_dataset = data.PetsDataset(
                 args.dataset_dir+'/pets', train=True, dogs=False,
-                transform=TransformsSimCLR(args.image_size).test_transform
+                transform=TransformsSimCLR(size=args.image_size).test_transform
             )
             test_dataset = data.PetsDataset(
                 args.dataset_dir+'/pets', train=False, dogs=False,
-                transform=TransformsSimCLR(args.image_size).test_transform
+                transform=TransformsSimCLR(size=args.image_size).test_transform
             )
     else:
         if args.dataset == "STL10":
@@ -174,26 +174,26 @@ if __name__ == "__main__":
                 args.dataset_dir,
                 split="train",
                 download=True,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
             test_dataset = torchvision.datasets.STL10(
                 args.dataset_dir,
                 split="test",
                 download=True,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
         elif args.dataset == "CIFAR10":
             train_dataset = torchvision.datasets.CIFAR10(
                 args.dataset_dir,
                 train=True,
                 download=True,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
             test_dataset = torchvision.datasets.CIFAR10(
                 args.dataset_dir,
                 train=False,
                 download=True,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
         elif args.dataset == "Imagenette":
             train_dataset = data.ImagenetDataset(
@@ -201,14 +201,14 @@ if __name__ == "__main__":
                 args.dataset_dir + "/imagenette/train",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
             test_dataset = data.ImagenetDataset(
                 args.dataset_dir + "/imagenette/val.csv",
                 args.dataset_dir + "/imagenette/val",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
         elif args.dataset == "Imagenet-1pct":
             train_dataset = data.ImagenetDataset(
@@ -216,14 +216,14 @@ if __name__ == "__main__":
                 args.dataset_dir + "/imagenet-1pct/train",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
             test_dataset = data.ImagenetDataset(
                 args.dataset_dir + "/imagenet-val/val.csv",
                 args.dataset_dir + "/imagenet-val/val",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
         elif args.dataset == "Imagenet-10pct":
             train_dataset = data.ImagenetDataset(
@@ -231,14 +231,14 @@ if __name__ == "__main__":
                 args.dataset_dir + "/imagenet-10pct/train",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
             test_dataset = data.ImagenetDataset(
                 args.dataset_dir + "/imagenet-val/val.csv",
                 args.dataset_dir + "/imagenet-val/val",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
         elif args.dataset == "HS-Imagenet":
             train_dataset = data.ImagenetDataset(
@@ -246,14 +246,14 @@ if __name__ == "__main__":
                 args.dataset_dir + "/imagenet/train",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
             test_dataset = data.ImagenetDataset(
                 args.val_csv,
                 args.dataset_dir + "/imagenet/val",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
         elif args.dataset == "Demon-Imagenet":
             train_dataset = data.ImagenetDataset(
@@ -261,14 +261,14 @@ if __name__ == "__main__":
                 args.dataset_dir + "/demon-dataset/train",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
             test_dataset = data.ImagenetDataset(
                 args.dataset_dir + "/demon-dataset/val-r.csv",
                 args.dataset_dir + "/imagenet/val",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
         elif args.dataset == "Almighty-Imagenet":
             train_dataset = data.ImagenetDataset(
@@ -276,14 +276,14 @@ if __name__ == "__main__":
                 args.dataset_dir + "/almighty-dataset/train",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
             test_dataset = data.ImagenetDataset(
                 args.dataset_dir + "/almighty-dataset/val-r.csv",
                 args.dataset_dir + "/imagenet/val",
                 num_variations=0,
                 transform_type=4,
-                transform=TransformsSimCLR(args.image_size).test_transform,
+                transform=TransformsSimCLR(size=args.image_size).test_transform,
             )
         else:
             raise NotImplementedError
