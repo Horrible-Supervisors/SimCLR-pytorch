@@ -265,7 +265,7 @@ if __name__ == "__main__":
             )
             test_dataset = data.ImagenetDataset(
                 args.dataset_dir + "/demon-dataset/val-r.csv",
-                args.dataset_dir + "/demon-dataset/val",
+                args.dataset_dir + "/imagenet/val",
                 num_variations=0,
                 transform_type=4,
                 transform=TransformsSimCLR(args.image_size).test_transform,
