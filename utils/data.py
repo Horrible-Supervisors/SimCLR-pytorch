@@ -84,6 +84,64 @@ class ImagenetDataset(Dataset):
         return image, label
 
 
+class PetsDataset(Dataset):
+    """Oxford-IIIT Pets dataset."""
+
+    def __init__(self, root_dir, train, dogs, transform):
+        """
+        Arguments:
+            root_dir (string): Directory with all the images of cute pets.
+            train (bool): Whether to load the training or validation set.
+            dogs (bool): Whether to load the cute dogs or everything.
+            transform (callable, optional): Optional transform to be applied
+        """
+        self.root_dir = root_dir
+        self.transform = transform
+        self.train = train
+        self.dogs = dogs
+        if self.train:
+            self.root_dir = os.path.join(self.root_dir, 'train')
+            if self.dogs:
+                self.image_frame = pd.read_csv(
+                    os.path.join(self.root_dir, 'train-dogs.csv'))
+            else:
+                self.image_frame = pd.read_csv(
+                    os.path.join(self.root_dir, 'train.csv'))
+        else:
+            self.root_dir = os.path.join(self.root_dir, 'val')
+            if self.dogs:
+                self.image_frame = pd.read_csv(
+                    os.path.join(self.root_dir, 'val-dogs.csv'))
+            else:
+                self.image_frame = pd.read_csv(
+                    os.path.join(self.root_dir, 'val.csv'))
+
+    def __len__(self):
+        if self.train:
+            if self.dogs:
+                return 3490
+            else:
+                return 5170
+        else:
+            if self.dogs:
+                return 1500
+            else:
+                return 2220
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        img_name = os.path.join(self.root_dir,
+                                str(self.image_frame.iloc[idx, 0]))
+        image = Image.open(img_name)
+        label = self.image_frame.iloc[idx, 1]
+
+        image = self.transform(image)
+
+        return image, label
+
+
 class NegativeImagenetDataset(Dataset):
     # Purpose of class:
     # Obtaining negative image variations for all class labels

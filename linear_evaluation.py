@@ -114,7 +114,8 @@ def test(args, loader, model, criterion):
 
         loss_epoch += loss.item()
 
-    return loss_epoch, accuracy_epoch, accuracy5_epoch, actual_class_ids, predicted_class_ids
+    return (loss_epoch, accuracy_epoch, accuracy5_epoch,
+            actual_class_ids, predicted_class_ids)
 
 
 if __name__ == "__main__":
@@ -124,6 +125,12 @@ if __name__ == "__main__":
         '--config', '-c', required=False, default="./config/config.yaml",
         help="""The config.yaml file to use. """
              """Contains the arguments for the training run.""")
+    config_parser.add_argument(
+        '--use-pets', '-p', action='store_true', required=False,
+        help="""Whether to use pets dataset.""")
+    config_parser.add_argument(
+        '--use-dogs', '-d', action='store_true', required=False,
+        help="""Whether to use only dogs from pets dataset.""")
     config_args, _ = config_parser.parse_known_args()
     config_filepath = config_args.config
 
@@ -142,124 +149,134 @@ if __name__ == "__main__":
 
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    if args.dataset == "STL10":
-        train_dataset = torchvision.datasets.STL10(
-            args.dataset_dir,
-            split="train",
-            download=True,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
+    if config_args.use_pets:
+        train_dataset = data.PetsDataset(
+            args.dataset_dir+'/pets', train=True, dogs=config_args.use_dogs,
+            transform=TransformsSimCLR(args.image_size).test_transform
         )
-        test_dataset = torchvision.datasets.STL10(
-            args.dataset_dir,
-            split="test",
-            download=True,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-    elif args.dataset == "CIFAR10":
-        train_dataset = torchvision.datasets.CIFAR10(
-            args.dataset_dir,
-            train=True,
-            download=True,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-        test_dataset = torchvision.datasets.CIFAR10(
-            args.dataset_dir,
-            train=False,
-            download=True,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-    elif args.dataset == "Imagenette":
-        train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenette/train.csv",
-            args.dataset_dir + "/imagenette/train",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-        test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenette/val.csv",
-            args.dataset_dir + "/imagenette/val",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-    elif args.dataset == "Imagenet-1pct":
-        train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenet-1pct/train.csv",
-            args.dataset_dir + "/imagenet-1pct/train",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-        test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenet-val/val.csv",
-            args.dataset_dir + "/imagenet-val/val",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-    elif args.dataset == "Imagenet-10pct":
-        train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenet-10pct/train.csv",
-            args.dataset_dir + "/imagenet-10pct/train",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-        test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/imagenet-val/val.csv",
-            args.dataset_dir + "/imagenet-val/val",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-    elif args.dataset == "HS-Imagenet":
-        train_dataset = data.ImagenetDataset(
-            args.train_csv,
-            args.dataset_dir + "/imagenet/train",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-        test_dataset = data.ImagenetDataset(
-            args.val_csv,
-            args.dataset_dir + "/imagenet/val",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-    elif args.dataset == "Demon-Imagenet":
-        train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/demon-dataset/train-r.csv",
-            args.dataset_dir + "/demon-dataset/train",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-        test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/demon-dataset/val-r.csv",
-            args.dataset_dir + "/demon-dataset/val",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-    elif args.dataset == "Almighty-Imagenet":
-        train_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/almighty-dataset/train-r.csv",
-            args.dataset_dir + "/almighty-dataset/train",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
-        )
-        test_dataset = data.ImagenetDataset(
-            args.dataset_dir + "/almighty-dataset/val-r.csv",
-            args.dataset_dir + "/imagenet/val",
-            num_variations=0,
-            transform_type=4,
-            transform=TransformsSimCLR(size=args.image_size).test_transform,
+        test_dataset = data.PetsDataset(
+            args.dataset_dir+'/pets', train=False, dogs=config_args.use_dogs,
+            transform=TransformsSimCLR(args.image_size).test_transform
         )
     else:
-        raise NotImplementedError
+        if args.dataset == "STL10":
+            train_dataset = torchvision.datasets.STL10(
+                args.dataset_dir,
+                split="train",
+                download=True,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+            test_dataset = torchvision.datasets.STL10(
+                args.dataset_dir,
+                split="test",
+                download=True,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+        elif args.dataset == "CIFAR10":
+            train_dataset = torchvision.datasets.CIFAR10(
+                args.dataset_dir,
+                train=True,
+                download=True,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+            test_dataset = torchvision.datasets.CIFAR10(
+                args.dataset_dir,
+                train=False,
+                download=True,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+        elif args.dataset == "Imagenette":
+            train_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/imagenette/train.csv",
+                args.dataset_dir + "/imagenette/train",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+            test_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/imagenette/val.csv",
+                args.dataset_dir + "/imagenette/val",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+        elif args.dataset == "Imagenet-1pct":
+            train_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/imagenet-1pct/train.csv",
+                args.dataset_dir + "/imagenet-1pct/train",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+            test_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/imagenet-val/val.csv",
+                args.dataset_dir + "/imagenet-val/val",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+        elif args.dataset == "Imagenet-10pct":
+            train_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/imagenet-10pct/train.csv",
+                args.dataset_dir + "/imagenet-10pct/train",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+            test_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/imagenet-val/val.csv",
+                args.dataset_dir + "/imagenet-val/val",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+        elif args.dataset == "HS-Imagenet":
+            train_dataset = data.ImagenetDataset(
+                args.train_csv,
+                args.dataset_dir + "/imagenet/train",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+            test_dataset = data.ImagenetDataset(
+                args.val_csv,
+                args.dataset_dir + "/imagenet/val",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+        elif args.dataset == "Demon-Imagenet":
+            train_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/demon-dataset/train-r.csv",
+                args.dataset_dir + "/demon-dataset/train",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+            test_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/demon-dataset/val-r.csv",
+                args.dataset_dir + "/demon-dataset/val",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+        elif args.dataset == "Almighty-Imagenet":
+            train_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/almighty-dataset/train-r.csv",
+                args.dataset_dir + "/almighty-dataset/train",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+            test_dataset = data.ImagenetDataset(
+                args.dataset_dir + "/almighty-dataset/val-r.csv",
+                args.dataset_dir + "/imagenet/val",
+                num_variations=0,
+                transform_type=4,
+                transform=TransformsSimCLR(args.image_size).test_transform,
+            )
+        else:
+            raise NotImplementedError
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
@@ -337,11 +354,17 @@ if __name__ == "__main__":
     print("Include negative samples: ", args.include_neg_samples)
     print("Number of negative samples: ", args.n_img_samples_per_class)
 
-    visualizations.plot_confusion_matrix(actual_class_ids, predicted_class_ids, 'Actual Class Ids', 'Predicted Class Ids', 
-                                         'CF_Grid_' + args.model_path + '_' + str(args.transform_type) + '_' + str(args.include_neg_samples) + '.png',
-                                         args.model_path + '_' + str(args.transform_type) + '_' + str(args.include_neg_samples),
-                                         show_grid=True, unique_id_count=50)
-    visualizations.plot_confusion_matrix(actual_class_ids, predicted_class_ids, 'Actual Class Ids', 'Predicted Class Ids', 
-                                         'CF_' + args.model_path + '_' + str(args.transform_type) + '_' + str(args.include_neg_samples) + '.png',
-                                         args.model_path + '_' + str(args.transform_type) + '_' + str(args.include_neg_samples), 
-                                         show_grid=False, unique_id_count=50)
+    visualizations.plot_confusion_matrix(
+        actual_class_ids, predicted_class_ids, 'Actual Class Ids',
+        'Predicted Class Ids', 'CF_Grid_' + args.model_path + '_' +
+        str(args.transform_type) + '_' + str(args.include_neg_samples) +
+        '.png', args.model_path + '_' + str(args.transform_type) + '_' +
+        str(args.include_neg_samples), show_grid=True, unique_id_count=50
+    )
+    visualizations.plot_confusion_matrix(
+        actual_class_ids, predicted_class_ids, 'Actual Class Ids',
+        'Predicted Class Ids', 'CF_' + args.model_path + '_' +
+        str(args.transform_type) + '_' + str(args.include_neg_samples) +
+        '.png', args.model_path + '_' + str(args.transform_type) + '_' +
+        str(args.include_neg_samples), show_grid=False, unique_id_count=50
+    )
