@@ -86,6 +86,7 @@ def train(args, loader, model, criterion, optimizer):
 def test(args, loader, model, criterion):
     loss_epoch = 0
     accuracy_epoch = 0
+    accuracy3_epoch = 0
     accuracy5_epoch = 0
     model.eval()
 
@@ -105,16 +106,20 @@ def test(args, loader, model, criterion):
         predicted = output.argmax(1)
         predicted_class_ids = predicted_class_ids + predicted.tolist()
 
+        predicted_top3 = output.topk(3, 1)[1]
         predicted_top5 = output.topk(5, 1)[1]
         acc = (predicted == y).sum().item() / y.size(0)
+        acc_3 = sum([1 if y[i] in predicted_top3[i]
+                    else 0 for i in range(len(y))]) / y.size(0)
         acc_5 = sum([1 if y[i] in predicted_top5[i]
                     else 0 for i in range(len(y))]) / y.size(0)
         accuracy_epoch += acc
+        accuracy3_epoch += acc_3
         accuracy5_epoch += acc_5
 
         loss_epoch += loss.item()
 
-    return (loss_epoch, accuracy_epoch, accuracy5_epoch,
+    return (loss_epoch, accuracy_epoch, accuracy3_epoch, accuracy5_epoch,
             actual_class_ids, predicted_class_ids)
 
 
@@ -341,18 +346,23 @@ if __name__ == "__main__":
               f"""Loss: {loss_epoch / len(arr_train_loader)}\t """
               f"""Accuracy: {accuracy_epoch / len(arr_train_loader)}""")
         if epoch % 50 == 0:
-            loss_epoch, accuracy_epoch, accuracy5_epoch, _, _ = test(
+            (loss_epoch, accuracy_epoch, accuracy3_epoch,
+             accuracy5_epoch, _, _) = test(
                 args, arr_test_loader, model, criterion)
             print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
                   f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}\t """
                   f"""Accuracy Top 5: {
+                      accuracy5_epoch / len(arr_test_loader)}\t """
+                  f"""Accuracy Top 5: {
                       accuracy5_epoch / len(arr_test_loader)}""")
 
     # final testing
-    loss_epoch, accuracy_epoch, accuracy5_epoch, actual_class_ids, predicted_class_ids = test(
+    (loss_epoch, accuracy_epoch, accuracy3_epoch, accuracy5_epoch,
+     actual_class_ids, predicted_class_ids) = test(
         args, arr_test_loader, model, criterion)
     print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
           f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}\t """
+          f"""Accuracy Top 3: {accuracy3_epoch / len(arr_test_loader)}\t """
           f"""Accuracy Top 5: {accuracy5_epoch / len(arr_test_loader)}""")
 
     print("Dataset: ", args.dataset)
