@@ -363,7 +363,7 @@ if __name__ == "__main__":
                 args, arr_test_loader, model, criterion)
             print(f"""[FINAL]\t Loss: {loss_epoch / len(arr_test_loader)}\t """
                   f"""Accuracy: {accuracy_epoch / len(arr_test_loader)}\t """
-                  f"""Accuracy Top 5: {
+                  f"""Accuracy Top 3: {
                       accuracy5_epoch / len(arr_test_loader)}\t """
                   f"""Accuracy Top 5: {
                       accuracy5_epoch / len(arr_test_loader)}""")
