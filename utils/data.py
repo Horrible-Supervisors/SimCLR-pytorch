@@ -137,6 +137,8 @@ class PetsDataset(Dataset):
         img_name = os.path.join(self.root_dir,
                                 str(self.image_frame.iloc[idx, 0]))
         image = Image.open(img_name)
+        # convert this image from jpeg to png
+        image = image.convert('RGB')
         label = self.image_frame.iloc[idx, 1]
 
         image = self.transform(image)
