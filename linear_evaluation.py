@@ -134,6 +134,9 @@ if __name__ == "__main__":
         '--use-pets', '-p', action='store_true', required=False,
         help="""Whether to use pets dataset.""")
     config_parser.add_argument(
+        '--use-caltech', '-ct', action='store_true', required=False,
+        help="""Whether to use pets dataset.""")
+    config_parser.add_argument(
         '--use-dogs', '-d', action='store_true', required=False,
         help="""Whether to use only dogs from pets dataset.""")
     config_args, _ = config_parser.parse_known_args()
@@ -173,6 +176,15 @@ if __name__ == "__main__":
                 args.dataset_dir+'/pets', train=False, dogs=False,
                 transform=TransformsSimCLR(size=args.image_size).test_transform
             )
+    elif config_args.use_caltech:
+        train_dataset = data.CaltechDataset(
+            args.dataset_dir+'/caltech-101', train=True,
+            transform=TransformsSimCLR(size=args.image_size).test_transform
+        )
+        test_dataset = data.CaltechDataset(
+            args.dataset_dir+'/caltech-101', train=False,
+            transform=TransformsSimCLR(size=args.image_size).test_transform
+        )
     else:
         if args.dataset == "STL10":
             train_dataset = torchvision.datasets.STL10(
@@ -376,6 +388,8 @@ if __name__ == "__main__":
     if config_args.use_pets:
         print("Use pets dataset: ", config_args.use_pets)
         print("Use dogs from pets dataset: ", config_args.use_dogs)
+    elif config_args.use_caltech:
+        print("Use caltech dataset: ", config_args.use_caltech)
 
     visualizations.plot_confusion_matrix(
         actual_class_ids, predicted_class_ids, 'Actual Class Ids',
