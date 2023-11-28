@@ -373,6 +373,9 @@ if __name__ == "__main__":
     print("Model Path: ", args.model_path)
     print("Include negative samples: ", args.include_neg_samples)
     print("Number of negative samples: ", args.n_img_samples_per_class)
+    if config_args.use_pets:
+        print("Use pets dataset: ", config_args.use_pets)
+        print("Use dogs from pets dataset: ", config_args.use_dogs)
 
     visualizations.plot_confusion_matrix(
         actual_class_ids, predicted_class_ids, 'Actual Class Ids',
