@@ -162,7 +162,7 @@ class CaltechDataset(Dataset):
         if self.train:
             self.image_frame = pd.read_csv(
                 os.path.join(self.root_dir, 'train.csv'))
-            self.root_dir = os.path.join(self.root_dir, 'train-dogs')
+            self.root_dir = os.path.join(self.root_dir, 'train')
         else:
             self.image_frame = pd.read_csv(
                 os.path.join(self.root_dir, 'val.csv'))
