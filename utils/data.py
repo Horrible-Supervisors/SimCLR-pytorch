@@ -144,6 +144,50 @@ class PetsDataset(Dataset):
         image = self.transform(image)
 
         return image, label
+    
+
+class CaltechDataset(Dataset):
+    """Caltech-101 dataset."""
+
+    def __init__(self, root_dir, train, transform):
+        """
+        Arguments:
+            root_dir (string): Directory with all the images of cute pets.
+            train (bool): Whether to load the training or validation set.
+            transform (callable, optional): Optional transform to be applied
+        """
+        self.root_dir = root_dir
+        self.transform = transform
+        self.train = train
+        if self.train:
+            self.image_frame = pd.read_csv(
+                os.path.join(self.root_dir, 'train.csv'))
+            self.root_dir = os.path.join(self.root_dir, 'train')
+        else:
+            self.image_frame = pd.read_csv(
+                os.path.join(self.root_dir, 'val.csv'))
+            self.root_dir = os.path.join(self.root_dir, 'val')
+
+    def __len__(self):
+        if self.train:
+            return 6026
+        else:
+            return 2651
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        img_name = os.path.join(self.root_dir,
+                                str(self.image_frame.iloc[idx, 0]))
+        image = Image.open(img_name)
+        # convert this image from jpeg to png
+        image = image.convert('RGB')
+        label = self.image_frame.iloc[idx, 1]
+
+        image = self.transform(image)
+
+        return image, label
 
 
 class NegativeImagenetDataset(Dataset):
